@@ -30,10 +30,13 @@ let wheelResetTimeoutId = null;
 let currentEnterDirection = "default";
 let panOffsetX = 0;
 let panMinX = 0;
+let panOffsetY = 0;
+let panMinY = 0;
+let panStartOffsetX = 0;
+let panStartOffsetY = 0;
 let currentPanImage = null;
 let touchStartTime = 0;
-let touchLastX = 0;
-let touchLastY = 0;
+let wheelGestureLocked = false;
 
 function buildSpreads(pageList) {
   const result = [];
@@ -253,16 +256,22 @@ function handleSingleTap(clientX) {
 function resetPanState() {
   panOffsetX = 0;
   panMinX = 0;
+  panOffsetY = 0;
+  panMinY = 0;
+  panStartOffsetX = 0;
+  panStartOffsetY = 0;
   currentPanImage = null;
 }
 
-function applyPanOffset(nextOffsetX) {
+function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
   if (!currentPanImage) {
     return;
   }
 
   panOffsetX = Math.max(panMinX, Math.min(0, nextOffsetX));
+  panOffsetY = Math.max(panMinY, Math.min(0, nextOffsetY));
   currentPanImage.style.setProperty("--pan-x", `${panOffsetX}px`);
+  currentPanImage.style.setProperty("--pan-y", `${panOffsetY}px`);
 }
 
 function setupFullscreenPan() {
@@ -281,16 +290,23 @@ function setupFullscreenPan() {
   currentPanImage = visibleImage;
 
   const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
   const imageWidth = visibleImage.getBoundingClientRect().width;
+  const imageHeight = visibleImage.getBoundingClientRect().height;
   const overflowX = Math.max(0, imageWidth - viewportWidth);
+  const overflowY = Math.max(0, imageHeight - viewportHeight);
 
   panMinX = -overflowX;
-  applyPanOffset(overflowX > 0 ? panOffsetX : 0);
+  panMinY = -overflowY;
+  applyPanOffset(overflowX > 0 ? panOffsetX : 0, overflowY > 0 ? panOffsetY : 0);
 }
 
-function resetWheelTracking() {
+function resetWheelTracking(unlockGesture = true) {
   wheelDeltaX = 0;
   wheelDeltaY = 0;
+  if (unlockGesture) {
+    wheelGestureLocked = false;
+  }
   if (wheelResetTimeoutId) {
     clearTimeout(wheelResetTimeoutId);
     wheelResetTimeoutId = null;
@@ -309,28 +325,42 @@ function handleWheelNavigation(event) {
     resetWheelTracking();
   }, 140);
 
+  if (wheelGestureLocked) {
+    event.preventDefault();
+    return;
+  }
+
   const horizontalDistance = Math.abs(wheelDeltaX);
   const verticalDistance = Math.abs(wheelDeltaY);
+  const dominantDistance = Math.max(horizontalDistance, verticalDistance);
+
+  if (isFullscreenActive() && currentPanImage && (panMinX < 0 || panMinY < 0) && dominantDistance < 48) {
+    event.preventDefault();
+    applyPanOffset(panOffsetX - event.deltaX, panOffsetY - event.deltaY);
+    return;
+  }
 
   if (isFullscreenActive() && verticalDistance > horizontalDistance && verticalDistance > 36) {
     event.preventDefault();
+    wheelGestureLocked = true;
     if (wheelDeltaY > 0) {
       goNext("up");
     } else {
       goPrevious("down");
     }
-    resetWheelTracking();
+    resetWheelTracking(false);
     return;
   }
 
   if (horizontalDistance > verticalDistance && horizontalDistance > 36) {
     event.preventDefault();
+    wheelGestureLocked = true;
     if (wheelDeltaX > 0) {
       goNext("forward");
     } else {
       goPrevious("back");
     }
-    resetWheelTracking();
+    resetWheelTracking(false);
   }
 }
 
@@ -364,8 +394,8 @@ spreadRoot.addEventListener(
     touchStartTime = Date.now();
     touchStartX = event.touches[0].clientX;
     touchStartY = event.touches[0].clientY;
-    touchLastX = touchStartX;
-    touchLastY = touchStartY;
+    panStartOffsetX = panOffsetX;
+    panStartOffsetY = panOffsetY;
   },
   { passive: true }
 );
@@ -379,8 +409,6 @@ spreadRoot.addEventListener(
 
     const deltaX = event.touches[0].clientX - touchStartX;
     const deltaY = event.touches[0].clientY - touchStartY;
-    touchLastX = event.touches[0].clientX;
-    touchLastY = event.touches[0].clientY;
 
     if (Math.abs(deltaX) > 12 || Math.abs(deltaY) > 12) {
       touchMoved = true;
@@ -390,11 +418,10 @@ spreadRoot.addEventListener(
       isFullscreenActive() &&
       isTouchLayout() &&
       currentPanImage &&
-      panMinX < 0 &&
-      Math.abs(deltaX) > Math.abs(deltaY)
+      (panMinX < 0 || panMinY < 0)
     ) {
       event.preventDefault();
-      applyPanOffset(deltaX);
+      applyPanOffset(panStartOffsetX + deltaX, panStartOffsetY + deltaY);
     }
   },
   { passive: false }
@@ -413,6 +440,8 @@ spreadRoot.addEventListener(
     const horizontalDistance = Math.abs(deltaX);
     const verticalDistance = Math.abs(deltaY);
     const touchDuration = Date.now() - touchStartTime;
+    const dominantDistance = Math.max(horizontalDistance, verticalDistance);
+    const fastSwipe = touchDuration < 220 && dominantDistance > 70;
 
     touchTracking = false;
 
@@ -438,16 +467,12 @@ spreadRoot.addEventListener(
       return;
     }
 
+    if (isFullscreenActive() && isTouchLayout() && currentPanImage && (panMinX < 0 || panMinY < 0) && !fastSwipe) {
+      applyPanOffset(panStartOffsetX + deltaX, panStartOffsetY + deltaY);
+      return;
+    }
+
     if (horizontalDistance >= 48 && horizontalDistance > verticalDistance) {
-      if (isFullscreenActive() && isTouchLayout() && currentPanImage && panMinX < 0) {
-        const isFastSwipe = touchDuration < 220 && horizontalDistance > 70;
-
-        if (!isFastSwipe) {
-          applyPanOffset(deltaX);
-          return;
-        }
-      }
-
       if (deltaX < 0) {
         goNext("forward");
         return;
