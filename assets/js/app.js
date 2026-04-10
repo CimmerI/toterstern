@@ -1,9 +1,8 @@
-const pages = [
-  "comics/Cinderella-2026-0001.png",
-  "comics/Cinderella-2026-0002.png",
-  "comics/Cinderella-2026-0003.png",
-  "comics/Cinderella-2026-0004.png",
-];
+const totalPages = 10;
+const pages = Array.from({ length: totalPages }, (_, index) => {
+  const pageNumber = String(index + 1).padStart(4, "0");
+  return `comics/Cinderella-2026-${pageNumber}.png`;
+});
 
 const spreads = buildSpreads(pages);
 
