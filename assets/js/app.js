@@ -23,6 +23,10 @@ let touchTracking = false;
 let touchMoved = false;
 let lastTapTime = 0;
 let singleTapTimeoutId = null;
+let wheelDeltaX = 0;
+let wheelDeltaY = 0;
+let wheelResetTimeoutId = null;
+let currentEnterDirection = "default";
 
 function buildSpreads(pageList) {
   const result = [];
@@ -60,6 +64,7 @@ function createPageSlot(side, src, alt) {
   const slot = document.createElement("div");
   slot.className = `page-slot ${side}${src ? "" : " empty"}`;
   slot.dataset.enter = "true";
+  slot.dataset.enterDirection = currentEnterDirection;
 
   if (src) {
     const img = document.createElement("img");
@@ -157,35 +162,41 @@ function goTo(index) {
   render();
 }
 
-function goNext() {
+function goNext(direction = "forward") {
   if (isMobileView()) {
     if (currentIndex < pages.length - 1) {
+      currentEnterDirection = direction;
       goTo(currentIndex + 1);
     }
     return;
   }
 
   if (currentIndex < spreads.length - 1) {
+    currentEnterDirection = direction;
     goTo(currentIndex + 1);
   }
 }
 
-function goPrevious() {
+function goPrevious(direction = "back") {
   if (currentIndex > 0) {
+    currentEnterDirection = direction;
     goTo(currentIndex - 1);
   }
 }
 
 function goToStart() {
+  currentEnterDirection = "down";
   goTo(0);
 }
 
 function goToEnd() {
   if (isMobileView()) {
+    currentEnterDirection = "up";
     goTo(pages.length - 1);
     return;
   }
 
+  currentEnterDirection = "up";
   goTo(spreads.length - 1);
 }
 
@@ -213,22 +224,77 @@ function handleSingleTap(clientX) {
   const viewportThird = window.innerWidth / 3;
 
   if (clientX < viewportThird) {
-    goPrevious();
+    goPrevious("back");
     return;
   }
 
   if (clientX > window.innerWidth - viewportThird) {
-    goNext();
+    goNext("forward");
   }
 }
 
-prevButton.addEventListener("click", goPrevious);
-nextButton.addEventListener("click", goNext);
-tapLeft.addEventListener("click", goPrevious);
-tapRight.addEventListener("click", goNext);
+function resetWheelTracking() {
+  wheelDeltaX = 0;
+  wheelDeltaY = 0;
+  if (wheelResetTimeoutId) {
+    clearTimeout(wheelResetTimeoutId);
+    wheelResetTimeoutId = null;
+  }
+}
+
+function handleWheelNavigation(event) {
+  wheelDeltaX += event.deltaX;
+  wheelDeltaY += event.deltaY;
+
+  if (wheelResetTimeoutId) {
+    clearTimeout(wheelResetTimeoutId);
+  }
+
+  wheelResetTimeoutId = window.setTimeout(() => {
+    resetWheelTracking();
+  }, 140);
+
+  const horizontalDistance = Math.abs(wheelDeltaX);
+  const verticalDistance = Math.abs(wheelDeltaY);
+
+  if (isFullscreenActive() && verticalDistance > horizontalDistance && verticalDistance > 36) {
+    event.preventDefault();
+    if (wheelDeltaY > 0) {
+      goNext("up");
+    } else {
+      goPrevious("down");
+    }
+    resetWheelTracking();
+    return;
+  }
+
+  if (horizontalDistance > verticalDistance && horizontalDistance > 36) {
+    event.preventDefault();
+    if (wheelDeltaX > 0) {
+      goNext("forward");
+    } else {
+      goPrevious("back");
+    }
+    resetWheelTracking();
+  }
+}
+
+prevButton.addEventListener("click", () => {
+  goPrevious("back");
+});
+nextButton.addEventListener("click", () => {
+  goNext("forward");
+});
+tapLeft.addEventListener("click", () => {
+  goPrevious("back");
+});
+tapRight.addEventListener("click", () => {
+  goNext("forward");
+});
 spreadRoot.addEventListener("dblclick", () => {
   toggleFullscreen();
 });
+reader.addEventListener("wheel", handleWheelNavigation, { passive: false });
 
 spreadRoot.addEventListener(
   "touchstart",
@@ -302,15 +368,25 @@ spreadRoot.addEventListener(
 
     if (horizontalDistance >= 48 && horizontalDistance > verticalDistance) {
       if (deltaX < 0) {
-        goNext();
+        goNext("forward");
         return;
       }
 
-      goPrevious();
+      goPrevious("back");
       return;
     }
 
     if (verticalDistance < 56 || verticalDistance <= horizontalDistance) {
+      return;
+    }
+
+    if (isFullscreenActive()) {
+      if (deltaY < 0) {
+        goNext("up");
+        return;
+      }
+
+      goPrevious("down");
       return;
     }
 
@@ -332,18 +408,32 @@ window.addEventListener("keydown", (event) => {
   switch (event.key) {
     case "ArrowLeft":
       event.preventDefault();
-      goPrevious();
+      goPrevious("back");
       break;
     case "ArrowRight":
       event.preventDefault();
-      goNext();
+      goNext("forward");
       break;
     case "ArrowUp":
+      event.preventDefault();
+      if (isFullscreenActive()) {
+        goPrevious("down");
+      } else {
+        goToStart();
+      }
+      break;
+    case "ArrowDown":
+      event.preventDefault();
+      if (isFullscreenActive()) {
+        goNext("up");
+      } else {
+        goToEnd();
+      }
+      break;
     case "Home":
       event.preventDefault();
       goToStart();
       break;
-    case "ArrowDown":
     case "End":
       event.preventDefault();
       goToEnd();
