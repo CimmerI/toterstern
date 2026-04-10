@@ -45,9 +45,15 @@ let autoplayFrameId = null;
 let autoplayResumeTimeoutId = null;
 let lastAutoplayTimestamp = 0;
 let autoplayDirection = -1;
+let currentZoom = 1;
+let pinchActive = false;
+let pinchStartDistance = 0;
+let pinchStartZoom = 1;
 
 const AUTOPLAY_RESUME_DELAY = 1800;
 const AUTOPLAY_CYCLE_MS = 18000;
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 2;
 
 function buildSpreads(pageList) {
   const result = [];
@@ -277,6 +283,10 @@ function resetPanState() {
   panPointerActive = false;
   panPointerId = null;
   autoplayDirection = -1;
+  currentZoom = 1;
+  pinchActive = false;
+  pinchStartDistance = 0;
+  pinchStartZoom = 1;
   currentPanImage = null;
 }
 
@@ -341,6 +351,21 @@ function registerManualPanIntent() {
   stopAutoplay();
 }
 
+function applyZoom(nextZoom) {
+  if (!currentPanImage) {
+    return;
+  }
+
+  currentZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, nextZoom));
+  currentPanImage.style.setProperty("--zoom", `${currentZoom}`);
+}
+
+function getTouchDistance(touches) {
+  const deltaX = touches[0].clientX - touches[1].clientX;
+  const deltaY = touches[0].clientY - touches[1].clientY;
+  return Math.hypot(deltaX, deltaY);
+}
+
 function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
   if (!currentPanImage) {
     return;
@@ -352,7 +377,7 @@ function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
   currentPanImage.style.setProperty("--pan-y", `${panOffsetY}px`);
 }
 
-function setupFullscreenPan() {
+function setupFullscreenPan(shouldScheduleAutoplay = true) {
   if (!isFullscreenActive()) {
     resetPanState();
     return;
@@ -366,18 +391,22 @@ function setupFullscreenPan() {
   }
 
   currentPanImage = visibleImage;
+  applyZoom(currentZoom);
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const imageWidth = visibleImage.getBoundingClientRect().width;
-  const imageHeight = visibleImage.getBoundingClientRect().height;
+  const imageWidth = visibleImage.offsetWidth * currentZoom;
+  const imageHeight = visibleImage.offsetHeight * currentZoom;
   const overflowX = Math.max(0, imageWidth - viewportWidth);
   const overflowY = Math.max(0, imageHeight - viewportHeight);
 
   panMinX = -overflowX;
   panMinY = -overflowY;
   applyPanOffset(overflowX > 0 ? panOffsetX : 0, overflowY > 0 ? panOffsetY : 0);
-  scheduleAutoplay();
+
+  if (shouldScheduleAutoplay) {
+    scheduleAutoplay();
+  }
 }
 
 function resetWheelTracking(unlockGesture = true) {
@@ -515,6 +544,16 @@ reader.addEventListener("pointercancel", () => {
 spreadRoot.addEventListener(
   "touchstart",
   (event) => {
+    if (isFullscreenActive() && isTouchLayout() && event.touches.length === 2) {
+      touchTracking = false;
+      panPointerActive = true;
+      pinchActive = true;
+      pinchStartDistance = getTouchDistance(event.touches);
+      pinchStartZoom = currentZoom;
+      registerManualPanIntent();
+      return;
+    }
+
     if (event.touches.length !== 1) {
       touchTracking = false;
       return;
@@ -536,6 +575,14 @@ spreadRoot.addEventListener(
 spreadRoot.addEventListener(
   "touchmove",
   (event) => {
+    if (pinchActive && event.touches.length === 2 && currentPanImage) {
+      event.preventDefault();
+      registerManualPanIntent();
+      applyZoom(pinchStartZoom * (getTouchDistance(event.touches) / pinchStartDistance));
+      setupFullscreenPan(false);
+      return;
+    }
+
     if (!touchTracking || event.touches.length !== 1) {
       return;
     }
@@ -563,6 +610,30 @@ spreadRoot.addEventListener(
 spreadRoot.addEventListener(
   "touchend",
   (event) => {
+    if (pinchActive) {
+      if (event.touches.length >= 2) {
+        return;
+      }
+
+      pinchActive = false;
+
+      if (event.touches.length === 1) {
+        touchTracking = true;
+        panPointerActive = true;
+        touchMoved = false;
+        touchStartTime = Date.now();
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+        panStartOffsetX = panOffsetX;
+        panStartOffsetY = panOffsetY;
+        return;
+      }
+
+      panPointerActive = false;
+      scheduleAutoplay();
+      return;
+    }
+
     if (!touchTracking || event.changedTouches.length !== 1) {
       touchTracking = false;
       return;

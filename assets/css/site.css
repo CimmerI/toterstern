@@ -168,6 +168,7 @@ body::before {
 .comic-page {
   --pan-x: 0px;
   --pan-y: 0px;
+  --zoom: 1;
   display: block;
   width: min(100%, 540px);
   max-height: 74vh;
@@ -179,6 +180,7 @@ body::before {
     0 0 28px rgba(177, 31, 42, 0.2);
   background: var(--panel);
   translate: var(--pan-x) var(--pan-y);
+  scale: var(--zoom);
 }
 
 .page-slot.left .comic-page {
