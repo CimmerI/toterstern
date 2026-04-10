@@ -1,0 +1,347 @@
+:root {
+  --bg: #050505;
+  --bg-soft: #101010;
+  --panel: rgba(18, 18, 18, 0.88);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f4efe5;
+  --muted: rgba(244, 239, 229, 0.72);
+  --accent: #b11f2a;
+  --accent-soft: rgba(177, 31, 42, 0.45);
+  --shadow: rgba(0, 0, 0, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(177, 31, 42, 0.18), transparent 38%),
+    radial-gradient(circle at bottom, rgba(104, 12, 19, 0.2), transparent 30%),
+    linear-gradient(180deg, #0d0d0d 0%, #020202 100%);
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.035) 50%, transparent 100%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.015) 0,
+      rgba(255, 255, 255, 0.015) 2px,
+      transparent 2px,
+      transparent 14px
+    );
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.4;
+}
+
+.page-shell {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 28px 18px;
+}
+
+.site-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.site-mark {
+  color: var(--text);
+  text-decoration: none;
+  font-family: "Old English Text MT", "UnifrakturCook", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 22px rgba(177, 31, 42, 0.28);
+}
+
+.site-subtitle,
+.page-status {
+  margin: 0;
+  color: var(--muted);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.page-status {
+  padding-top: 14px;
+}
+
+.reader {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(64px, 84px) minmax(0, 1fr) minmax(64px, 84px);
+  align-items: center;
+  gap: 18px;
+}
+
+.book-stage {
+  position: relative;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 0 16px;
+}
+
+.book-glow {
+  position: absolute;
+  width: min(84vw, 1120px);
+  height: min(72vh, 860px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(177, 31, 42, 0.18) 0%, rgba(177, 31, 42, 0.08) 36%, transparent 72%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  z-index: 2;
+  border: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), transparent);
+  opacity: 0;
+  transition: opacity 180ms ease;
+  touch-action: manipulation;
+}
+
+.tap-zone-left {
+  left: 0;
+}
+
+.tap-zone-right {
+  right: 0;
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.02), transparent);
+}
+
+.book-stage:hover .tap-zone,
+.book-stage:focus-within .tap-zone {
+  opacity: 1;
+}
+
+.spread {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 1180px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 24px);
+  align-items: center;
+}
+
+.page-slot {
+  min-height: min(72vh, 820px);
+  display: flex;
+  align-items: center;
+}
+
+.page-slot.left {
+  justify-content: flex-end;
+}
+
+.page-slot.right {
+  justify-content: flex-start;
+}
+
+.page-slot.empty {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.comic-page {
+  display: block;
+  width: min(100%, 540px);
+  max-height: 74vh;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 30px 70px var(--shadow),
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 0 28px rgba(177, 31, 42, 0.2);
+  background: var(--panel);
+}
+
+.page-slot.left .comic-page {
+  transform-origin: right center;
+}
+
+.page-slot.right .comic-page {
+  transform-origin: left center;
+}
+
+.page-slot[data-enter="true"] .comic-page {
+  animation: page-enter 320ms ease both;
+}
+
+.nav-button {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: clamp(56px, 7vw, 80px);
+  height: clamp(56px, 7vw, 80px);
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(14, 14, 14, 0.76);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, opacity 180ms ease;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+.nav-button:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(26, 26, 26, 0.92);
+}
+
+.nav-button:active {
+  transform: scale(0.98);
+}
+
+.nav-button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.nav-button svg {
+  width: 62%;
+  height: 62%;
+  fill: currentColor;
+  filter: drop-shadow(0 0 12px rgba(177, 31, 42, 0.26));
+}
+
+.reader-hint {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-top: 10px;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.985) translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    overflow: auto;
+  }
+
+  .page-shell {
+    padding: 20px 16px 14px;
+  }
+
+  .site-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .reader {
+    grid-template-columns: 56px minmax(0, 1fr) 56px;
+    gap: 10px;
+  }
+
+  .spread {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .page-slot {
+    min-height: auto;
+  }
+
+  .comic-page {
+    max-height: none;
+    width: 100%;
+  }
+
+  .reader-hint {
+    gap: 14px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .reader {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .book-stage {
+    order: 1;
+    padding: 8px 0;
+  }
+
+  .tap-zone {
+    width: 22%;
+  }
+
+  .nav-button {
+    position: fixed;
+    bottom: 22px;
+  }
+
+  .nav-button-left {
+    left: 16px;
+  }
+
+  .nav-button-right {
+    right: 16px;
+  }
+
+  .spread {
+    grid-template-columns: 1fr;
+  }
+
+  .page-slot.left,
+  .page-slot.right {
+    justify-content: center;
+  }
+
+  .page-slot.empty {
+    display: none;
+  }
+
+  .reader-hint {
+    padding-bottom: 86px;
+  }
+}

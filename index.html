@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toterstern</title>
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div>
+        <a class="site-mark" href="#top">Toterstern</a>
+        <p class="site-subtitle">Cinderella</p>
+      </div>
+      <div class="page-status" aria-live="polite">
+        <span id="spread-label">Page 1</span>
+      </div>
+    </header>
+
+    <main class="reader" id="top">
+      <button class="nav-button nav-button-left" id="prev-button" type="button" aria-label="Previous spread">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <path d="M88 20C67 19 51 27 44 41c-4 8-4 17-2 24l-13-7c-6-3-13 0-15 6s1 12 7 15l38 20c5 3 12 1 15-5l21-38c3-6 1-13-5-16s-13-1-16 5l-8 14c-4-8-3-18 2-26 5-7 14-11 24-11h2c7 0 12-5 12-11S95 20 88 20Z"/>
+        </svg>
+      </button>
+
+      <section class="book-stage" aria-label="Comic viewer">
+        <div class="book-glow"></div>
+        <div class="tap-zone tap-zone-left" id="tap-left" aria-hidden="true"></div>
+        <div class="tap-zone tap-zone-right" id="tap-right" aria-hidden="true"></div>
+        <div class="spread" id="spread"></div>
+      </section>
+
+      <button class="nav-button nav-button-right" id="next-button" type="button" aria-label="Next spread">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <path d="M32 20c21-1 37 7 44 21 4 8 4 17 2 24l13-7c6-3 13 0 15 6s-1 12-7 15L61 99c-5 3-12 1-15-5L25 56c-3-6-1-13 5-16s13-1 16 5l8 14c4-8 3-18-2-26-5-7-14-11-24-11h-2c-7 0-12-5-12-11s5-11 12-11h8Z"/>
+        </svg>
+      </button>
+    </main>
+
+    <footer class="reader-hint">
+      <span>Left / Right</span>
+      <span>Up to the beginning</span>
+      <span>Down to the end</span>
+    </footer>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
