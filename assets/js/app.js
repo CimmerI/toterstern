@@ -1,8 +1,8 @@
 const pages = [
-  "comics/%D0%A1inderella-2026-0001.png",
-  "comics/%D0%A1inderella-2026-0002.png",
-  "comics/%D0%A1inderella-2026-0003.png",
-  "comics/%D0%A1inderella-2026-0004.png",
+  "comics/Cinderella-2026-0001.png",
+  "comics/Cinderella-2026-0002.png",
+  "comics/Cinderella-2026-0003.png",
+  "comics/Cinderella-2026-0004.png",
 ];
 
 const spreads = buildSpreads(pages);
