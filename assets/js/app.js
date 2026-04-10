@@ -37,6 +37,16 @@ let panStartOffsetY = 0;
 let currentPanImage = null;
 let touchStartTime = 0;
 let wheelGestureLocked = false;
+let panPointerActive = false;
+let panPointerId = null;
+let panPointerStartX = 0;
+let panPointerStartY = 0;
+let autoplayFrameId = null;
+let autoplayResumeTimeoutId = null;
+let lastAutoplayTimestamp = 0;
+
+const AUTOPLAY_RESUME_DELAY = 1800;
+const AUTOPLAY_PAN_SPEED = 0.02;
 
 function buildSpreads(pageList) {
   const result = [];
@@ -223,8 +233,11 @@ function isFullscreenActive() {
 
 function syncFullscreenState() {
   pageShell.classList.toggle("is-fullscreen", isFullscreenActive());
-  if (!isFullscreenActive()) {
+  if (isFullscreenActive()) {
+    setupFullscreenPan();
+  } else {
     resetPanState();
+    stopAutoplay();
   }
 }
 
@@ -260,7 +273,65 @@ function resetPanState() {
   panMinY = 0;
   panStartOffsetX = 0;
   panStartOffsetY = 0;
+  panPointerActive = false;
+  panPointerId = null;
   currentPanImage = null;
+}
+
+function stopAutoplay() {
+  if (autoplayFrameId) {
+    cancelAnimationFrame(autoplayFrameId);
+    autoplayFrameId = null;
+  }
+
+  if (autoplayResumeTimeoutId) {
+    clearTimeout(autoplayResumeTimeoutId);
+    autoplayResumeTimeoutId = null;
+  }
+
+  lastAutoplayTimestamp = 0;
+}
+
+function autoplayStep(timestamp) {
+  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
+    autoplayFrameId = null;
+    return;
+  }
+
+  if (!lastAutoplayTimestamp) {
+    lastAutoplayTimestamp = timestamp;
+  }
+
+  const deltaTime = timestamp - lastAutoplayTimestamp;
+  lastAutoplayTimestamp = timestamp;
+
+  if (panOffsetX > panMinX) {
+    applyPanOffset(panOffsetX - deltaTime * AUTOPLAY_PAN_SPEED, panOffsetY);
+  }
+
+  if (panOffsetX > panMinX) {
+    autoplayFrameId = requestAnimationFrame(autoplayStep);
+    return;
+  }
+
+  autoplayFrameId = null;
+}
+
+function scheduleAutoplay() {
+  stopAutoplay();
+
+  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
+    return;
+  }
+
+  autoplayResumeTimeoutId = window.setTimeout(() => {
+    lastAutoplayTimestamp = 0;
+    autoplayFrameId = requestAnimationFrame(autoplayStep);
+  }, AUTOPLAY_RESUME_DELAY);
+}
+
+function registerManualPanIntent() {
+  stopAutoplay();
 }
 
 function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
@@ -275,7 +346,7 @@ function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
 }
 
 function setupFullscreenPan() {
-  if (!isFullscreenActive() || !isTouchLayout()) {
+  if (!isFullscreenActive()) {
     resetPanState();
     return;
   }
@@ -299,6 +370,7 @@ function setupFullscreenPan() {
   panMinX = -overflowX;
   panMinY = -overflowY;
   applyPanOffset(overflowX > 0 ? panOffsetX : 0, overflowY > 0 ? panOffsetY : 0);
+  scheduleAutoplay();
 }
 
 function resetWheelTracking(unlockGesture = true) {
@@ -336,13 +408,16 @@ function handleWheelNavigation(event) {
 
   if (isFullscreenActive() && currentPanImage && (panMinX < 0 || panMinY < 0) && dominantDistance < 48) {
     event.preventDefault();
+    registerManualPanIntent();
     applyPanOffset(panOffsetX - event.deltaX, panOffsetY - event.deltaY);
+    scheduleAutoplay();
     return;
   }
 
   if (isFullscreenActive() && verticalDistance > horizontalDistance && verticalDistance > 36) {
     event.preventDefault();
     wheelGestureLocked = true;
+    registerManualPanIntent();
     if (wheelDeltaY > 0) {
       goNext("up");
     } else {
@@ -355,6 +430,7 @@ function handleWheelNavigation(event) {
   if (horizontalDistance > verticalDistance && horizontalDistance > 36) {
     event.preventDefault();
     wheelGestureLocked = true;
+    registerManualPanIntent();
     if (wheelDeltaX > 0) {
       goNext("forward");
     } else {
@@ -377,9 +453,57 @@ tapRight.addEventListener("click", () => {
   goNext("forward");
 });
 spreadRoot.addEventListener("dblclick", () => {
+  registerManualPanIntent();
   toggleFullscreen();
 });
 reader.addEventListener("wheel", handleWheelNavigation, { passive: false });
+reader.addEventListener("mousemove", () => {
+  if (isFullscreenActive()) {
+    registerManualPanIntent();
+    scheduleAutoplay();
+  }
+});
+reader.addEventListener("pointerdown", (event) => {
+  if (!isFullscreenActive() || !currentPanImage || event.pointerType === "touch") {
+    return;
+  }
+
+  panPointerActive = true;
+  panPointerId = event.pointerId;
+  panPointerStartX = event.clientX;
+  panPointerStartY = event.clientY;
+  panStartOffsetX = panOffsetX;
+  panStartOffsetY = panOffsetY;
+  registerManualPanIntent();
+});
+reader.addEventListener("pointermove", (event) => {
+  if (
+    !panPointerActive ||
+    panPointerId !== event.pointerId ||
+    !isFullscreenActive() ||
+    !currentPanImage
+  ) {
+    return;
+  }
+
+  const deltaX = event.clientX - panPointerStartX;
+  const deltaY = event.clientY - panPointerStartY;
+  applyPanOffset(panStartOffsetX + deltaX, panStartOffsetY + deltaY);
+});
+reader.addEventListener("pointerup", (event) => {
+  if (panPointerId !== event.pointerId) {
+    return;
+  }
+
+  panPointerActive = false;
+  panPointerId = null;
+  scheduleAutoplay();
+});
+reader.addEventListener("pointercancel", () => {
+  panPointerActive = false;
+  panPointerId = null;
+  scheduleAutoplay();
+});
 
 spreadRoot.addEventListener(
   "touchstart",
@@ -390,12 +514,14 @@ spreadRoot.addEventListener(
     }
 
     touchTracking = true;
+    panPointerActive = true;
     touchMoved = false;
     touchStartTime = Date.now();
     touchStartX = event.touches[0].clientX;
     touchStartY = event.touches[0].clientY;
     panStartOffsetX = panOffsetX;
     panStartOffsetY = panOffsetY;
+    registerManualPanIntent();
   },
   { passive: true }
 );
@@ -444,6 +570,7 @@ spreadRoot.addEventListener(
     const fastSwipe = touchDuration < 220 && dominantDistance > 70;
 
     touchTracking = false;
+    panPointerActive = false;
 
     if (!touchMoved) {
       const currentTapTime = Date.now();
@@ -469,6 +596,7 @@ spreadRoot.addEventListener(
 
     if (isFullscreenActive() && isTouchLayout() && currentPanImage && (panMinX < 0 || panMinY < 0) && !fastSwipe) {
       applyPanOffset(panStartOffsetX + deltaX, panStartOffsetY + deltaY);
+      scheduleAutoplay();
       return;
     }
 
