@@ -166,6 +166,7 @@ body::before {
 }
 
 .comic-page {
+  --pan-x: 0px;
   display: block;
   width: min(100%, 540px);
   max-height: 74vh;
@@ -176,6 +177,7 @@ body::before {
     0 0 0 1px rgba(255, 255, 255, 0.03),
     0 0 28px rgba(177, 31, 42, 0.2);
   background: var(--panel);
+  translate: var(--pan-x) 0;
 }
 
 .page-slot.left .comic-page {
@@ -376,6 +378,7 @@ body::before {
     height: 100vh;
     max-width: none;
     max-height: none;
+    touch-action: none;
   }
 }
 
@@ -455,5 +458,6 @@ body::before {
     height: 100vh;
     max-width: none;
     max-height: none;
+    touch-action: none;
   }
 }
