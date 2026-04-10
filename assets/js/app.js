@@ -1,4 +1,4 @@
-const totalPages = 10;
+const totalPages = 9;
 const pages = Array.from({ length: totalPages }, (_, index) => {
   const pageNumber = String(index + 1).padStart(4, "0");
   return `comics/Cinderella-2026-${pageNumber}.png`;
