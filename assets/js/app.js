@@ -7,6 +7,8 @@ const pages = Array.from({ length: totalPages }, (_, index) => {
 const spreads = buildSpreads(pages);
 const mobileMediaQuery = window.matchMedia("(max-width: 640px)");
 
+const pageShell = document.querySelector(".page-shell");
+const reader = document.querySelector(".reader");
 const spreadRoot = document.getElementById("spread");
 const spreadLabel = document.getElementById("spread-label");
 const prevButton = document.getElementById("prev-button");
@@ -19,6 +21,8 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchTracking = false;
 let touchMoved = false;
+let lastTapTime = 0;
+let singleTapTimeoutId = null;
 
 function buildSpreads(pageList) {
   const result = [];
@@ -185,10 +189,46 @@ function goToEnd() {
   goTo(spreads.length - 1);
 }
 
+function isFullscreenActive() {
+  return document.fullscreenElement === reader;
+}
+
+function syncFullscreenState() {
+  pageShell.classList.toggle("is-fullscreen", isFullscreenActive());
+}
+
+async function toggleFullscreen() {
+  try {
+    if (isFullscreenActive()) {
+      await document.exitFullscreen();
+    } else {
+      await reader.requestFullscreen({ navigationUI: "hide" });
+    }
+  } catch (_error) {
+    pageShell.classList.toggle("is-fullscreen");
+  }
+}
+
+function handleSingleTap(clientX) {
+  const viewportThird = window.innerWidth / 3;
+
+  if (clientX < viewportThird) {
+    goPrevious();
+    return;
+  }
+
+  if (clientX > window.innerWidth - viewportThird) {
+    goNext();
+  }
+}
+
 prevButton.addEventListener("click", goPrevious);
 nextButton.addEventListener("click", goNext);
 tapLeft.addEventListener("click", goPrevious);
 tapRight.addEventListener("click", goNext);
+spreadRoot.addEventListener("dblclick", () => {
+  toggleFullscreen();
+});
 
 spreadRoot.addEventListener(
   "touchstart",
@@ -239,18 +279,24 @@ spreadRoot.addEventListener(
     touchTracking = false;
 
     if (!touchMoved) {
-      const tapTarget = event.changedTouches[0].clientX;
-      const viewportThird = window.innerWidth / 3;
+      const currentTapTime = Date.now();
 
-      if (tapTarget < viewportThird) {
-        goPrevious();
+      if (currentTapTime - lastTapTime < 320) {
+        if (singleTapTimeoutId) {
+          clearTimeout(singleTapTimeoutId);
+          singleTapTimeoutId = null;
+        }
+        lastTapTime = 0;
+        toggleFullscreen();
         return;
       }
 
-      if (tapTarget > window.innerWidth - viewportThird) {
-        goNext();
-      }
-
+      lastTapTime = currentTapTime;
+      const tapTarget = event.changedTouches[0].clientX;
+      singleTapTimeoutId = window.setTimeout(() => {
+        handleSingleTap(tapTarget);
+        singleTapTimeoutId = null;
+      }, 320);
       return;
     }
 
@@ -302,6 +348,11 @@ window.addEventListener("keydown", (event) => {
       event.preventDefault();
       goToEnd();
       break;
+    case "f":
+    case "F":
+      event.preventDefault();
+      toggleFullscreen();
+      break;
     default:
       break;
   }
@@ -312,4 +363,7 @@ mobileMediaQuery.addEventListener("change", (event) => {
   render();
 });
 
+document.addEventListener("fullscreenchange", syncFullscreenState);
+
+syncFullscreenState();
 render();
