@@ -44,9 +44,10 @@ let panPointerStartY = 0;
 let autoplayFrameId = null;
 let autoplayResumeTimeoutId = null;
 let lastAutoplayTimestamp = 0;
+let autoplayDirection = -1;
 
 const AUTOPLAY_RESUME_DELAY = 1800;
-const AUTOPLAY_PAN_SPEED = 0.02;
+const AUTOPLAY_CYCLE_MS = 18000;
 
 function buildSpreads(pageList) {
   const result = [];
@@ -275,6 +276,7 @@ function resetPanState() {
   panStartOffsetY = 0;
   panPointerActive = false;
   panPointerId = null;
+  autoplayDirection = -1;
   currentPanImage = null;
 }
 
@@ -304,17 +306,22 @@ function autoplayStep(timestamp) {
 
   const deltaTime = timestamp - lastAutoplayTimestamp;
   lastAutoplayTimestamp = timestamp;
+  const halfCycleMs = AUTOPLAY_CYCLE_MS / 2;
+  const pixelsPerMs = Math.abs(panMinX) / halfCycleMs;
 
-  if (panOffsetX > panMinX) {
-    applyPanOffset(panOffsetX - deltaTime * AUTOPLAY_PAN_SPEED, panOffsetY);
+  if (pixelsPerMs > 0) {
+    applyPanOffset(panOffsetX + autoplayDirection * pixelsPerMs * deltaTime, panOffsetY);
   }
 
-  if (panOffsetX > panMinX) {
-    autoplayFrameId = requestAnimationFrame(autoplayStep);
-    return;
+  if (panOffsetX <= panMinX) {
+    applyPanOffset(panMinX, panOffsetY);
+    autoplayDirection = 1;
+  } else if (panOffsetX >= 0) {
+    applyPanOffset(0, panOffsetY);
+    autoplayDirection = -1;
   }
 
-  autoplayFrameId = null;
+  autoplayFrameId = requestAnimationFrame(autoplayStep);
 }
 
 function scheduleAutoplay() {
