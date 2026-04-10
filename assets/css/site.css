@@ -337,6 +337,10 @@ body::before {
     justify-content: center;
   }
 
+  .page-slot.mobile-single {
+    justify-content: center;
+  }
+
   .page-slot.empty {
     display: none;
   }

@@ -5,6 +5,7 @@ const pages = Array.from({ length: totalPages }, (_, index) => {
 });
 
 const spreads = buildSpreads(pages);
+const mobileMediaQuery = window.matchMedia("(max-width: 640px)");
 
 const spreadRoot = document.getElementById("spread");
 const spreadLabel = document.getElementById("spread-label");
@@ -13,7 +14,7 @@ const nextButton = document.getElementById("next-button");
 const tapLeft = document.getElementById("tap-left");
 const tapRight = document.getElementById("tap-right");
 
-let currentSpreadIndex = 0;
+let currentIndex = 0;
 let touchStartX = 0;
 let touchStartY = 0;
 let touchTracking = false;
@@ -68,7 +69,41 @@ function createPageSlot(side, src, alt) {
   return slot;
 }
 
-function renderSpread(index) {
+function isMobileView() {
+  return mobileMediaQuery.matches;
+}
+
+function findSpreadIndexByPage(pageNumber) {
+  return spreads.findIndex((spread) => spread.pages.includes(pageNumber));
+}
+
+function getDesktopIndexFromCurrentIndex(index = currentIndex) {
+  if (!isMobileView()) {
+    return Math.max(0, Math.min(index, spreads.length - 1));
+  }
+
+  return Math.max(0, findSpreadIndexByPage(index + 1));
+}
+
+function getMobileIndexFromCurrentIndex(index = currentIndex) {
+  if (isMobileView()) {
+    return Math.max(0, Math.min(index, pages.length - 1));
+  }
+
+  const spread = spreads[Math.max(0, Math.min(index, spreads.length - 1))];
+  return Math.max(...spread.pages) - 1;
+}
+
+function convertIndexForModeChange(nextIsMobile) {
+  if (nextIsMobile) {
+    const spread = spreads[Math.max(0, Math.min(currentIndex, spreads.length - 1))];
+    return Math.max(...spread.pages) - 1;
+  }
+
+  return Math.max(0, findSpreadIndexByPage(currentIndex + 1));
+}
+
+function renderDesktopSpread(index) {
   const spread = spreads[index];
 
   spreadRoot.replaceChildren(
@@ -89,21 +124,65 @@ function renderSpread(index) {
   nextButton.disabled = index === spreads.length - 1;
 }
 
-function goToSpread(index) {
-  currentSpreadIndex = Math.max(0, Math.min(index, spreads.length - 1));
-  renderSpread(currentSpreadIndex);
+function renderMobilePage(index) {
+  spreadRoot.replaceChildren(
+    createPageSlot("right mobile-single", pages[index], `Comic page ${index + 1}`)
+  );
+
+  spreadLabel.textContent = `Page ${index + 1}`;
+  prevButton.disabled = index === 0;
+  nextButton.disabled = index === pages.length - 1;
+}
+
+function render() {
+  if (isMobileView()) {
+    renderMobilePage(getMobileIndexFromCurrentIndex());
+    return;
+  }
+
+  renderDesktopSpread(getDesktopIndexFromCurrentIndex());
+}
+
+function goTo(index) {
+  if (isMobileView()) {
+    currentIndex = Math.max(0, Math.min(index, pages.length - 1));
+  } else {
+    currentIndex = Math.max(0, Math.min(index, spreads.length - 1));
+  }
+
+  render();
 }
 
 function goNext() {
-  if (currentSpreadIndex < spreads.length - 1) {
-    goToSpread(currentSpreadIndex + 1);
+  if (isMobileView()) {
+    if (currentIndex < pages.length - 1) {
+      goTo(currentIndex + 1);
+    }
+    return;
+  }
+
+  if (currentIndex < spreads.length - 1) {
+    goTo(currentIndex + 1);
   }
 }
 
 function goPrevious() {
-  if (currentSpreadIndex > 0) {
-    goToSpread(currentSpreadIndex - 1);
+  if (currentIndex > 0) {
+    goTo(currentIndex - 1);
   }
+}
+
+function goToStart() {
+  goTo(0);
+}
+
+function goToEnd() {
+  if (isMobileView()) {
+    goTo(pages.length - 1);
+    return;
+  }
+
+  goTo(spreads.length - 1);
 }
 
 prevButton.addEventListener("click", goPrevious);
@@ -190,11 +269,11 @@ spreadRoot.addEventListener(
     }
 
     if (deltaY < 0) {
-      goToSpread(0);
+      goToStart();
       return;
     }
 
-    goToSpread(spreads.length - 1);
+    goToEnd();
   },
   { passive: true }
 );
@@ -216,16 +295,21 @@ window.addEventListener("keydown", (event) => {
     case "ArrowUp":
     case "Home":
       event.preventDefault();
-      goToSpread(0);
+      goToStart();
       break;
     case "ArrowDown":
     case "End":
       event.preventDefault();
-      goToSpread(spreads.length - 1);
+      goToEnd();
       break;
     default:
       break;
   }
 });
 
-renderSpread(currentSpreadIndex);
+mobileMediaQuery.addEventListener("change", (event) => {
+  currentIndex = convertIndexForModeChange(event.matches);
+  render();
+});
+
+render();
