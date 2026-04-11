@@ -299,6 +299,7 @@ body::before {
   max-height: none;
   height: auto;
   object-fit: contain;
+  transform-origin: top left;
 }
 
 @keyframes page-enter {

@@ -197,6 +197,10 @@ function goTo(index) {
 }
 
 function goNext(direction = "forward") {
+  if (isFullscreenActive() && isZoomedIn()) {
+    return;
+  }
+
   if (isMobileView()) {
     if (currentIndex < pages.length - 1) {
       currentEnterDirection = direction;
@@ -212,6 +216,10 @@ function goNext(direction = "forward") {
 }
 
 function goPrevious(direction = "back") {
+  if (isFullscreenActive() && isZoomedIn()) {
+    return;
+  }
+
   if (currentIndex > 0) {
     currentEnterDirection = direction;
     goTo(currentIndex - 1);
@@ -219,11 +227,19 @@ function goPrevious(direction = "back") {
 }
 
 function goToStart() {
+  if (isFullscreenActive() && isZoomedIn()) {
+    return;
+  }
+
   currentEnterDirection = "down";
   goTo(0);
 }
 
 function goToEnd() {
+  if (isFullscreenActive() && isZoomedIn()) {
+    return;
+  }
+
   if (isMobileView()) {
     currentEnterDirection = "up";
     goTo(pages.length - 1);
@@ -236,6 +252,10 @@ function goToEnd() {
 
 function isFullscreenActive() {
   return document.fullscreenElement === reader;
+}
+
+function isZoomedIn() {
+  return currentZoom > 1.001;
 }
 
 function syncFullscreenState() {
@@ -305,7 +325,7 @@ function stopAutoplay() {
 }
 
 function autoplayStep(timestamp) {
-  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
+  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive || isZoomedIn()) {
     autoplayFrameId = null;
     return;
   }
@@ -337,7 +357,7 @@ function autoplayStep(timestamp) {
 function scheduleAutoplay() {
   stopAutoplay();
 
-  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
+  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive || isZoomedIn()) {
     return;
   }
 
@@ -446,7 +466,9 @@ function handleWheelNavigation(event) {
     event.preventDefault();
     registerManualPanIntent();
     applyPanOffset(panOffsetX - event.deltaX, panOffsetY - event.deltaY);
-    scheduleAutoplay();
+    if (!isZoomedIn()) {
+      scheduleAutoplay();
+    }
     return;
   }
 
@@ -550,6 +572,8 @@ spreadRoot.addEventListener(
       pinchActive = true;
       pinchStartDistance = getTouchDistance(event.touches);
       pinchStartZoom = currentZoom;
+      panStartOffsetX = panOffsetX;
+      panStartOffsetY = panOffsetY;
       registerManualPanIntent();
       return;
     }
@@ -630,7 +654,9 @@ spreadRoot.addEventListener(
       }
 
       panPointerActive = false;
-      scheduleAutoplay();
+      if (!isZoomedIn()) {
+        scheduleAutoplay();
+      }
       return;
     }
 
@@ -674,7 +700,9 @@ spreadRoot.addEventListener(
 
     if (isFullscreenActive() && isTouchLayout() && currentPanImage && (panMinX < 0 || panMinY < 0) && !fastSwipe) {
       applyPanOffset(panStartOffsetX + deltaX, panStartOffsetY + deltaY);
-      scheduleAutoplay();
+      if (!isZoomedIn()) {
+        scheduleAutoplay();
+      }
       return;
     }
 
