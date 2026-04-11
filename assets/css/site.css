@@ -580,3 +580,28 @@ body::before {
     touch-action: pan-x pan-y;
   }
 }
+
+@media (max-width: 640px) and (orientation: portrait) {
+  .page-shell.is-fullscreen .book-stage {
+    align-items: center;
+  }
+
+  .page-shell.is-fullscreen .spread {
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+  }
+
+  .page-shell.is-fullscreen .page-slot,
+  .page-shell.is-fullscreen .page-slot.mobile-single {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .page-shell.is-fullscreen .comic-page {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: none;
+  }
+}
