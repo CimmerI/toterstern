@@ -168,7 +168,6 @@ body::before {
 .comic-page {
   --pan-x: 0px;
   --pan-y: 0px;
-  --zoom: 1;
   display: block;
   width: min(100%, 540px);
   max-height: 74vh;
@@ -180,7 +179,6 @@ body::before {
     0 0 28px rgba(177, 31, 42, 0.2);
   background: var(--panel);
   translate: var(--pan-x) var(--pan-y);
-  scale: var(--zoom);
 }
 
 .page-slot.left .comic-page {
@@ -294,10 +292,10 @@ body::before {
 }
 
 .page-shell.is-fullscreen .comic-page {
-  width: 100%;
+  width: auto;
   max-width: none;
   max-height: none;
-  height: auto;
+  height: 100vh;
   object-fit: contain;
   transform-origin: top left;
 }
@@ -382,7 +380,11 @@ body::before {
     height: 100vh;
     max-width: none;
     max-height: none;
-    touch-action: none;
+    touch-action: pan-x pan-y;
+  }
+
+  .page-shell.is-fullscreen .nav-button {
+    display: none;
   }
 }
 
@@ -462,6 +464,6 @@ body::before {
     height: 100vh;
     max-width: none;
     max-height: none;
-    touch-action: none;
+    touch-action: pan-x pan-y;
   }
 }

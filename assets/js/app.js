@@ -45,15 +45,8 @@ let autoplayFrameId = null;
 let autoplayResumeTimeoutId = null;
 let lastAutoplayTimestamp = 0;
 let autoplayDirection = -1;
-let currentZoom = 1;
-let pinchActive = false;
-let pinchStartDistance = 0;
-let pinchStartZoom = 1;
-
 const AUTOPLAY_RESUME_DELAY = 1800;
 const AUTOPLAY_CYCLE_MS = 18000;
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 2;
 const PAN_OVERSCROLL_PX = 10;
 const FAST_SWIPE_DURATION_MS = 180;
 const FAST_SWIPE_DISTANCE_PX = 120;
@@ -200,10 +193,6 @@ function goTo(index) {
 }
 
 function goNext(direction = "forward") {
-  if (isFullscreenActive() && isZoomedIn()) {
-    return;
-  }
-
   if (isMobileView()) {
     if (currentIndex < pages.length - 1) {
       currentEnterDirection = direction;
@@ -219,10 +208,6 @@ function goNext(direction = "forward") {
 }
 
 function goPrevious(direction = "back") {
-  if (isFullscreenActive() && isZoomedIn()) {
-    return;
-  }
-
   if (currentIndex > 0) {
     currentEnterDirection = direction;
     goTo(currentIndex - 1);
@@ -230,19 +215,11 @@ function goPrevious(direction = "back") {
 }
 
 function goToStart() {
-  if (isFullscreenActive() && isZoomedIn()) {
-    return;
-  }
-
   currentEnterDirection = "down";
   goTo(0);
 }
 
 function goToEnd() {
-  if (isFullscreenActive() && isZoomedIn()) {
-    return;
-  }
-
   if (isMobileView()) {
     currentEnterDirection = "up";
     goTo(pages.length - 1);
@@ -255,10 +232,6 @@ function goToEnd() {
 
 function isFullscreenActive() {
   return document.fullscreenElement === reader;
-}
-
-function isZoomedIn() {
-  return currentZoom > 1.001;
 }
 
 function syncFullscreenState() {
@@ -306,10 +279,6 @@ function resetPanState() {
   panPointerActive = false;
   panPointerId = null;
   autoplayDirection = -1;
-  currentZoom = 1;
-  pinchActive = false;
-  pinchStartDistance = 0;
-  pinchStartZoom = 1;
   currentPanImage = null;
 }
 
@@ -328,7 +297,7 @@ function stopAutoplay() {
 }
 
 function autoplayStep(timestamp) {
-  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive || isZoomedIn()) {
+  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
     autoplayFrameId = null;
     return;
   }
@@ -360,7 +329,7 @@ function autoplayStep(timestamp) {
 function scheduleAutoplay() {
   stopAutoplay();
 
-  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive || isZoomedIn()) {
+  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
     return;
   }
 
@@ -372,21 +341,6 @@ function scheduleAutoplay() {
 
 function registerManualPanIntent() {
   stopAutoplay();
-}
-
-function applyZoom(nextZoom) {
-  if (!currentPanImage) {
-    return;
-  }
-
-  currentZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, nextZoom));
-  currentPanImage.style.setProperty("--zoom", `${currentZoom}`);
-}
-
-function getTouchDistance(touches) {
-  const deltaX = touches[0].clientX - touches[1].clientX;
-  const deltaY = touches[0].clientY - touches[1].clientY;
-  return Math.hypot(deltaX, deltaY);
 }
 
 function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
@@ -414,12 +368,11 @@ function setupFullscreenPan(shouldScheduleAutoplay = true) {
   }
 
   currentPanImage = visibleImage;
-  applyZoom(currentZoom);
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const imageWidth = visibleImage.offsetWidth * currentZoom;
-  const imageHeight = visibleImage.offsetHeight * currentZoom;
+  const imageWidth = visibleImage.offsetWidth;
+  const imageHeight = visibleImage.offsetHeight;
   const overflowX = Math.max(0, imageWidth - viewportWidth);
   const overflowY = Math.max(0, imageHeight - viewportHeight);
 
@@ -469,9 +422,7 @@ function handleWheelNavigation(event) {
     event.preventDefault();
     registerManualPanIntent();
     applyPanOffset(panOffsetX - event.deltaX, panOffsetY - event.deltaY);
-    if (!isZoomedIn()) {
-      scheduleAutoplay();
-    }
+    scheduleAutoplay();
     return;
   }
 
@@ -569,18 +520,6 @@ reader.addEventListener("pointercancel", () => {
 spreadRoot.addEventListener(
   "touchstart",
   (event) => {
-    if (isFullscreenActive() && isTouchLayout() && event.touches.length === 2) {
-      touchTracking = false;
-      panPointerActive = true;
-      pinchActive = true;
-      pinchStartDistance = getTouchDistance(event.touches);
-      pinchStartZoom = currentZoom;
-      panStartOffsetX = panOffsetX;
-      panStartOffsetY = panOffsetY;
-      registerManualPanIntent();
-      return;
-    }
-
     if (event.touches.length !== 1) {
       touchTracking = false;
       return;
@@ -602,14 +541,6 @@ spreadRoot.addEventListener(
 spreadRoot.addEventListener(
   "touchmove",
   (event) => {
-    if (pinchActive && event.touches.length === 2 && currentPanImage) {
-      event.preventDefault();
-      registerManualPanIntent();
-      applyZoom(pinchStartZoom * (getTouchDistance(event.touches) / pinchStartDistance));
-      setupFullscreenPan(false);
-      return;
-    }
-
     if (!touchTracking || event.touches.length !== 1) {
       return;
     }
@@ -637,32 +568,6 @@ spreadRoot.addEventListener(
 spreadRoot.addEventListener(
   "touchend",
   (event) => {
-    if (pinchActive) {
-      if (event.touches.length >= 2) {
-        return;
-      }
-
-      pinchActive = false;
-
-      if (event.touches.length === 1) {
-        touchTracking = true;
-        panPointerActive = true;
-        touchMoved = false;
-        touchStartTime = Date.now();
-        touchStartX = event.touches[0].clientX;
-        touchStartY = event.touches[0].clientY;
-        panStartOffsetX = panOffsetX;
-        panStartOffsetY = panOffsetY;
-        return;
-      }
-
-      panPointerActive = false;
-      if (!isZoomedIn()) {
-        scheduleAutoplay();
-      }
-      return;
-    }
-
     if (!touchTracking || event.changedTouches.length !== 1) {
       touchTracking = false;
       return;
@@ -705,19 +610,17 @@ spreadRoot.addEventListener(
 
     if (isFullscreenActive() && isTouchLayout() && currentPanImage && (panMinX < 0 || panMinY < 0) && !fastSwipe) {
       applyPanOffset(panStartOffsetX + deltaX, panStartOffsetY + deltaY);
-      if (!isZoomedIn()) {
-        scheduleAutoplay();
-      }
+      scheduleAutoplay();
       return;
     }
 
     if (horizontalDistance >= 48 && horizontalDistance > verticalDistance) {
       if (deltaX < 0) {
-        goNext("forward");
+        goPrevious("back");
         return;
       }
 
-      goPrevious("back");
+      goNext("forward");
       return;
     }
 
@@ -727,11 +630,11 @@ spreadRoot.addEventListener(
 
     if (isFullscreenActive()) {
       if (deltaY < 0) {
-        goNext("up");
+        goPrevious("down");
         return;
       }
 
-      goPrevious("down");
+      goNext("up");
       return;
     }
 
