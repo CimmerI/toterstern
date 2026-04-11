@@ -1,6 +1,6 @@
-const totalPages = 9;
+const totalPages = 10;
 const pages = Array.from({ length: totalPages }, (_, index) => {
-  const pageNumber = String(index + 1).padStart(4, "0");
+  const pageNumber = String(index).padStart(4, "0");
   return `comics/Cinderella-2026-${pageNumber}.png`;
 });
 
@@ -60,7 +60,7 @@ function buildSpreads(pageList) {
     return result;
   }
 
-  result.push({ left: null, right: pageList[0], pages: [1] });
+  result.push({ left: null, right: pageList[0], pages: [0] });
 
   for (let index = 1; index < pageList.length; index += 2) {
     const leftPage = pageList[index] || null;
@@ -68,11 +68,11 @@ function buildSpreads(pageList) {
     const pageNumbers = [];
 
     if (leftPage) {
-      pageNumbers.push(index + 1);
+      pageNumbers.push(index);
     }
 
     if (rightPage) {
-      pageNumbers.push(index + 2);
+      pageNumbers.push(index + 1);
     }
 
     result.push({
@@ -125,7 +125,7 @@ function spreadIndexToPageIndex(index) {
 }
 
 function pageIndexToSpreadIndex(index) {
-  return Math.max(0, findSpreadIndexByPage(Math.max(0, Math.min(index, pages.length - 1)) + 1));
+  return Math.max(0, findSpreadIndexByPage(Math.max(0, Math.min(index, pages.length - 1))));
 }
 
 function syncCurrentIndexForModeChange() {
@@ -168,10 +168,10 @@ function renderDesktopSpread(index) {
 
 function renderMobilePage(index) {
   spreadRoot.replaceChildren(
-    createPageSlot("right mobile-single", pages[index], `Comic page ${index + 1}`)
+    createPageSlot("right mobile-single", pages[index], `Comic page ${index}`)
   );
 
-  spreadLabel.textContent = `Page ${index + 1}`;
+  spreadLabel.textContent = `Page ${index}`;
   prevButton.disabled = index === 0;
   nextButton.disabled = index === pages.length - 1;
 }
