@@ -470,9 +470,9 @@ function handleWheelNavigation(event) {
     wheelGestureLocked = true;
     registerManualPanIntent();
     if (wheelDeltaY > 0) {
-      goNext("down");
+      goPrevious("down");
     } else {
-      goPrevious("up");
+      goNext("up");
     }
     resetWheelTracking(false);
     return;
@@ -669,20 +669,20 @@ spreadRoot.addEventListener(
 
     if (isFullscreenActive() || (!isTouchLayout() && !isMobileView())) {
       if (deltaY < 0) {
-        goPrevious("up");
+        goNext("up");
         return;
       }
 
-      goNext("down");
+      goPrevious("down");
       return;
     }
 
     if (deltaY < 0) {
-      goPrevious("up");
+      goNext("up");
       return;
     }
 
-    goNext("down");
+    goPrevious("down");
   },
   { passive: true }
 );
