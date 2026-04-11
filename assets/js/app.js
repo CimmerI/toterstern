@@ -120,6 +120,10 @@ function isTouchFullscreenMode() {
   return isFullscreenActive() && isTouchLayout();
 }
 
+function isPortraitMobileFullscreen() {
+  return isFullscreenActive() && isMobilePortraitReader();
+}
+
 function isSinglePageMode() {
   return isMobileView() || isTouchFullscreenMode();
 }
@@ -382,7 +386,13 @@ function autoplayStep(timestamp) {
 function scheduleAutoplay() {
   stopAutoplay();
 
-  if (!isFullscreenActive() || !currentPanImage || (panMinX >= 0 && panMinY >= 0) || panPointerActive) {
+  if (
+    !isFullscreenActive() ||
+    isPortraitMobileFullscreen() ||
+    !currentPanImage ||
+    (panMinX >= 0 && panMinY >= 0) ||
+    panPointerActive
+  ) {
     return;
   }
 
@@ -432,10 +442,13 @@ function setupFullscreenPan(shouldScheduleAutoplay = true) {
   const overflowX = Math.max(0, imageWidth - viewportWidth);
   const overflowY = Math.max(0, imageHeight - viewportHeight);
 
-  panMinX = -overflowX;
-  panMinY = -overflowY;
+  panMinX = isPortraitMobileFullscreen() ? 0 : -overflowX;
+  panMinY = isPortraitMobileFullscreen() ? 0 : -overflowY;
   autoplayAxis = isTouchFullscreenMode() && window.innerWidth > window.innerHeight && overflowY > 0 ? "y" : "x";
-  applyPanOffset(overflowX > 0 ? panOffsetX : 0, overflowY > 0 ? panOffsetY : 0);
+  applyPanOffset(
+    overflowX > 0 && !isPortraitMobileFullscreen() ? panOffsetX : 0,
+    overflowY > 0 && !isPortraitMobileFullscreen() ? panOffsetY : 0
+  );
 
   if (shouldScheduleAutoplay) {
     scheduleAutoplay();
@@ -620,6 +633,7 @@ spreadRoot.addEventListener(
 
     if (
       isFullscreenActive() &&
+      !isPortraitMobileFullscreen() &&
       isTouchLayout() &&
       currentPanImage &&
       (panMinX < 0 || panMinY < 0)
@@ -676,7 +690,14 @@ spreadRoot.addEventListener(
       return;
     }
 
-    if (isFullscreenActive() && isTouchLayout() && currentPanImage && (panMinX < 0 || panMinY < 0) && !fastSwipe) {
+    if (
+      isFullscreenActive() &&
+      !isPortraitMobileFullscreen() &&
+      isTouchLayout() &&
+      currentPanImage &&
+      (panMinX < 0 || panMinY < 0) &&
+      !fastSwipe
+    ) {
       applyPanOffset(panStartOffsetX + deltaX, panStartOffsetY + deltaY);
       scheduleAutoplay();
       return;
