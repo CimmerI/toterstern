@@ -293,14 +293,16 @@ async function toggleFullscreen() {
 }
 
 function handleSingleTap(clientX) {
-  const viewportThird = window.innerWidth / 3;
+  const viewportBoundary = isMobilePortraitReader()
+    ? window.innerWidth / 2
+    : window.innerWidth / 3;
 
-  if (clientX < viewportThird) {
+  if (clientX < viewportBoundary) {
     goPrevious("back");
     return;
   }
 
-  if (clientX > window.innerWidth - viewportThird) {
+  if (clientX > window.innerWidth - viewportBoundary) {
     goNext("forward");
   }
 }
@@ -667,6 +669,11 @@ spreadRoot.addEventListener(
     panPointerActive = false;
 
     if (!touchMoved) {
+      if (isMobilePortraitReader()) {
+        handleSingleTap(event.changedTouches[0].clientX);
+        return;
+      }
+
       const currentTapTime = Date.now();
 
       if (currentTapTime - lastTapTime < 320) {
@@ -687,6 +694,10 @@ spreadRoot.addEventListener(
         handleSingleTap(tapTarget);
         singleTapTimeoutId = null;
       }, 320);
+      return;
+    }
+
+    if (isMobilePortraitReader()) {
       return;
     }
 
