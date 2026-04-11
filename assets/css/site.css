@@ -136,6 +136,43 @@ body::before {
   right: 0;
 }
 
+.fullscreen-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 4;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.78);
+  color: var(--text);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.fullscreen-toggle span {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.fullscreen-toggle-close {
+  display: none;
+  font-size: 1.7rem;
+}
+
+.page-shell.is-fullscreen .fullscreen-toggle-open {
+  display: none;
+}
+
+.page-shell.is-fullscreen .fullscreen-toggle-close {
+  display: block;
+}
+
 .spread {
   --pan-x: 0px;
   --pan-y: 0px;
@@ -388,6 +425,55 @@ body::before {
 
   .page-shell.is-fullscreen .nav-button {
     display: none;
+  }
+}
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .book-stage {
+    padding-top: 64px;
+  }
+
+  .fullscreen-toggle {
+    display: inline-flex;
+  }
+
+  .page-shell.is-fullscreen .fullscreen-toggle {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+  }
+
+  .page-shell.is-fullscreen .reader {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+
+  .page-shell.is-fullscreen .book-stage {
+    min-height: 100vh;
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .page-shell.is-fullscreen .spread {
+    width: 100vw;
+    min-height: 100vh;
+    justify-items: start;
+  }
+
+  .page-shell.is-fullscreen .page-slot,
+  .page-shell.is-fullscreen .page-slot.mobile-single {
+    min-height: auto;
+    width: 100vw;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .page-shell.is-fullscreen .comic-page {
+    width: 100vw;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    touch-action: pan-x pan-y;
   }
 }
 

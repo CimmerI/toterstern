@@ -16,6 +16,7 @@ const prevButton = document.getElementById("prev-button");
 const nextButton = document.getElementById("next-button");
 const tapLeft = document.getElementById("tap-left");
 const tapRight = document.getElementById("tap-right");
+const fullscreenToggleButton = document.getElementById("fullscreen-toggle");
 let previousSinglePageMode = mobileMediaQuery.matches;
 
 let currentIndex = 0;
@@ -109,6 +110,10 @@ function isMobileView() {
 
 function isTouchLayout() {
   return touchDeviceMediaQuery.matches;
+}
+
+function isMobilePortraitReader() {
+  return isTouchLayout() && window.innerHeight > window.innerWidth;
 }
 
 function isTouchFullscreenMode() {
@@ -242,8 +247,24 @@ function isFullscreenActive() {
   return document.fullscreenElement === reader;
 }
 
+function syncFullscreenToggleButton() {
+  const fullscreenActive = isFullscreenActive();
+  const shouldShowButton = isMobilePortraitReader();
+
+  fullscreenToggleButton.hidden = !shouldShowButton;
+  fullscreenToggleButton.setAttribute(
+    "aria-label",
+    fullscreenActive ? "Exit fullscreen" : "Open fullscreen"
+  );
+  fullscreenToggleButton.setAttribute(
+    "title",
+    fullscreenActive ? "Exit fullscreen" : "Open fullscreen"
+  );
+}
+
 function syncFullscreenState() {
   pageShell.classList.toggle("is-fullscreen", isFullscreenActive());
+  syncFullscreenToggleButton();
   syncCurrentIndexForModeChange();
   if (isFullscreenActive()) {
     render();
@@ -507,6 +528,12 @@ spreadRoot.addEventListener("dblclick", () => {
   registerManualPanIntent();
   toggleFullscreen();
 });
+fullscreenToggleButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  registerManualPanIntent();
+  toggleFullscreen();
+});
 reader.addEventListener("wheel", handleWheelNavigation, { passive: false });
 reader.addEventListener("mousemove", () => {
   if (isFullscreenActive()) {
@@ -634,7 +661,9 @@ spreadRoot.addEventListener(
           singleTapTimeoutId = null;
         }
         lastTapTime = 0;
-        toggleFullscreen();
+        if (!isMobilePortraitReader()) {
+          toggleFullscreen();
+        }
         return;
       }
 
@@ -733,6 +762,7 @@ mobileMediaQuery.addEventListener("change", () => {
 });
 
 window.addEventListener("resize", () => {
+  syncFullscreenToggleButton();
   setupFullscreenPan();
   if (!isFullscreenActive()) {
     syncCurrentIndexForModeChange();
@@ -742,5 +772,6 @@ window.addEventListener("resize", () => {
 
 document.addEventListener("fullscreenchange", syncFullscreenState);
 
+syncFullscreenToggleButton();
 syncFullscreenState();
 render();
