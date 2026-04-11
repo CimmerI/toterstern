@@ -16,6 +16,7 @@ const prevButton = document.getElementById("prev-button");
 const nextButton = document.getElementById("next-button");
 const tapLeft = document.getElementById("tap-left");
 const tapRight = document.getElementById("tap-right");
+let previousSinglePageMode = mobileMediaQuery.matches;
 
 let currentIndex = 0;
 let touchStartX = 0;
@@ -114,6 +115,32 @@ function isTouchFullscreenMode() {
   return isFullscreenActive() && isTouchLayout();
 }
 
+function isSinglePageMode() {
+  return isMobileView() || isTouchFullscreenMode();
+}
+
+function spreadIndexToPageIndex(index) {
+  const spread = spreads[Math.max(0, Math.min(index, spreads.length - 1))];
+  return Math.max(...spread.pages) - 1;
+}
+
+function pageIndexToSpreadIndex(index) {
+  return Math.max(0, findSpreadIndexByPage(Math.max(0, Math.min(index, pages.length - 1)) + 1));
+}
+
+function syncCurrentIndexForModeChange() {
+  const nextSinglePageMode = isSinglePageMode();
+
+  if (nextSinglePageMode === previousSinglePageMode) {
+    return;
+  }
+
+  currentIndex = nextSinglePageMode
+    ? spreadIndexToPageIndex(currentIndex)
+    : pageIndexToSpreadIndex(currentIndex);
+  previousSinglePageMode = nextSinglePageMode;
+}
+
 function findSpreadIndexByPage(pageNumber) {
   return spreads.findIndex((spread) => spread.pages.includes(pageNumber));
 }
@@ -176,10 +203,10 @@ function renderMobilePage(index) {
 }
 
 function render() {
-  if (isTouchFullscreenMode() || isMobileView()) {
-    renderMobilePage(getMobileIndexFromCurrentIndex());
+  if (isSinglePageMode()) {
+    renderMobilePage(spreadIndexToPageIndex(currentIndex));
   } else {
-    renderDesktopSpread(getDesktopIndexFromCurrentIndex());
+    renderDesktopSpread(pageIndexToSpreadIndex(currentIndex));
   }
 
   window.requestAnimationFrame(() => {
@@ -188,7 +215,7 @@ function render() {
 }
 
 function goTo(index) {
-  if (isMobileView()) {
+  if (isSinglePageMode()) {
     currentIndex = Math.max(0, Math.min(index, pages.length - 1));
   } else {
     currentIndex = Math.max(0, Math.min(index, spreads.length - 1));
@@ -198,7 +225,7 @@ function goTo(index) {
 }
 
 function goNext(direction = "forward") {
-  if (isMobileView()) {
+  if (isSinglePageMode()) {
     if (currentIndex < pages.length - 1) {
       currentEnterDirection = direction;
       goTo(currentIndex + 1);
@@ -225,7 +252,7 @@ function goToStart() {
 }
 
 function goToEnd() {
-  if (isMobileView()) {
+  if (isSinglePageMode()) {
     currentEnterDirection = "up";
     goTo(pages.length - 1);
     return;
@@ -241,11 +268,14 @@ function isFullscreenActive() {
 
 function syncFullscreenState() {
   pageShell.classList.toggle("is-fullscreen", isFullscreenActive());
+  syncCurrentIndexForModeChange();
   if (isFullscreenActive()) {
+    render();
     setupFullscreenPan();
   } else {
     resetPanState();
     stopAutoplay();
+    render();
   }
 }
 
@@ -386,7 +416,10 @@ function setupFullscreenPan(shouldScheduleAutoplay = true) {
     return;
   }
 
-  const visibleImage = spreadRoot.querySelector(".comic-page");
+  const visibleImage =
+    !isTouchFullscreenMode() && spreadRoot.querySelectorAll(".comic-page").length > 1
+      ? spreadRoot
+      : spreadRoot.querySelector(".comic-page");
 
   if (!visibleImage) {
     resetPanState();
