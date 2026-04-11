@@ -444,6 +444,9 @@ function handleWheelNavigation(event) {
   const horizontalDistance = Math.abs(wheelDeltaX);
   const verticalDistance = Math.abs(wheelDeltaY);
   const dominantDistance = Math.max(horizontalDistance, verticalDistance);
+  const shouldHandleGesture =
+    isFullscreenActive() ||
+    (!isTouchLayout() && !isMobileView());
 
   if (isFullscreenActive() && currentPanImage && (panMinX < 0 || panMinY < 0) && dominantDistance < 48) {
     event.preventDefault();
@@ -453,20 +456,20 @@ function handleWheelNavigation(event) {
     return;
   }
 
-  if (isFullscreenActive() && verticalDistance > horizontalDistance && verticalDistance > 36) {
+  if (shouldHandleGesture && verticalDistance > horizontalDistance && verticalDistance > 36) {
     event.preventDefault();
     wheelGestureLocked = true;
     registerManualPanIntent();
     if (wheelDeltaY > 0) {
-      goNext("up");
+      goNext("down");
     } else {
-      goPrevious("down");
+      goPrevious("up");
     }
     resetWheelTracking(false);
     return;
   }
 
-  if (horizontalDistance > verticalDistance && horizontalDistance > 36) {
+  if (shouldHandleGesture && horizontalDistance > verticalDistance && horizontalDistance > 36) {
     event.preventDefault();
     wheelGestureLocked = true;
     registerManualPanIntent();
@@ -655,22 +658,22 @@ spreadRoot.addEventListener(
       return;
     }
 
-    if (isFullscreenActive()) {
+    if (isFullscreenActive() || (!isTouchLayout() && !isMobileView())) {
       if (deltaY < 0) {
-        goPrevious("down");
+        goPrevious("up");
         return;
       }
 
-      goNext("up");
+      goNext("down");
       return;
     }
 
     if (deltaY < 0) {
-      goToStart();
+      goPrevious("up");
       return;
     }
 
-    goToEnd();
+    goNext("down");
   },
   { passive: true }
 );
@@ -691,19 +694,11 @@ window.addEventListener("keydown", (event) => {
       break;
     case "ArrowUp":
       event.preventDefault();
-      if (isFullscreenActive()) {
-        goPrevious("down");
-      } else {
-        goToStart();
-      }
+      goPrevious("up");
       break;
     case "ArrowDown":
       event.preventDefault();
-      if (isFullscreenActive()) {
-        goNext("up");
-      } else {
-        goToEnd();
-      }
+      goNext("down");
       break;
     case "Home":
       event.preventDefault();
