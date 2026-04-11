@@ -54,6 +54,9 @@ const AUTOPLAY_RESUME_DELAY = 1800;
 const AUTOPLAY_CYCLE_MS = 18000;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 2;
+const PAN_OVERSCROLL_PX = 10;
+const FAST_SWIPE_DURATION_MS = 180;
+const FAST_SWIPE_DISTANCE_PX = 120;
 
 function buildSpreads(pageList) {
   const result = [];
@@ -391,8 +394,8 @@ function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
     return;
   }
 
-  panOffsetX = Math.max(panMinX, Math.min(0, nextOffsetX));
-  panOffsetY = Math.max(panMinY, Math.min(0, nextOffsetY));
+  panOffsetX = Math.max(panMinX - PAN_OVERSCROLL_PX, Math.min(PAN_OVERSCROLL_PX, nextOffsetX));
+  panOffsetY = Math.max(panMinY - PAN_OVERSCROLL_PX, Math.min(PAN_OVERSCROLL_PX, nextOffsetY));
   currentPanImage.style.setProperty("--pan-x", `${panOffsetX}px`);
   currentPanImage.style.setProperty("--pan-y", `${panOffsetY}px`);
 }
@@ -671,7 +674,9 @@ spreadRoot.addEventListener(
     const verticalDistance = Math.abs(deltaY);
     const touchDuration = Date.now() - touchStartTime;
     const dominantDistance = Math.max(horizontalDistance, verticalDistance);
-    const fastSwipe = touchDuration < 220 && dominantDistance > 70;
+    const fastSwipe =
+      touchDuration < FAST_SWIPE_DURATION_MS &&
+      dominantDistance > FAST_SWIPE_DISTANCE_PX;
 
     touchTracking = false;
     panPointerActive = false;
