@@ -704,6 +704,16 @@ spreadRoot.addEventListener(
     }
 
     if (horizontalDistance >= 48 && horizontalDistance > verticalDistance) {
+      if (isMobilePortraitReader()) {
+        if (deltaX < 0) {
+          goNext("forward");
+          return;
+        }
+
+        goPrevious("back");
+        return;
+      }
+
       if (deltaX < 0) {
         goPrevious("back");
         return;
