@@ -388,6 +388,28 @@ body::before {
   }
 }
 
+@media (max-width: 900px) and (orientation: landscape) {
+  .page-shell.is-fullscreen .spread {
+    width: 100vw;
+    min-height: 100vh;
+    justify-items: start;
+  }
+
+  .page-shell.is-fullscreen .page-slot,
+  .page-shell.is-fullscreen .page-slot.mobile-single {
+    min-height: 100vh;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .page-shell.is-fullscreen .comic-page {
+    width: 100vw;
+    height: auto;
+    max-width: none;
+    max-height: none;
+  }
+}
+
 @media (max-width: 640px) {
   .reader {
     grid-template-columns: 1fr;

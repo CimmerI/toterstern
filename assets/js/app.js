@@ -45,6 +45,7 @@ let autoplayFrameId = null;
 let autoplayResumeTimeoutId = null;
 let lastAutoplayTimestamp = 0;
 let autoplayDirection = -1;
+let autoplayAxis = "x";
 const AUTOPLAY_RESUME_DELAY = 1800;
 const AUTOPLAY_CYCLE_MS = 18000;
 const PAN_OVERSCROLL_PX = 10;
@@ -109,6 +110,10 @@ function isTouchLayout() {
   return touchDeviceMediaQuery.matches;
 }
 
+function isTouchFullscreenMode() {
+  return isFullscreenActive() && isTouchLayout();
+}
+
 function findSpreadIndexByPage(pageNumber) {
   return spreads.findIndex((spread) => spread.pages.includes(pageNumber));
 }
@@ -171,7 +176,7 @@ function renderMobilePage(index) {
 }
 
 function render() {
-  if (isMobileView()) {
+  if (isTouchFullscreenMode() || isMobileView()) {
     renderMobilePage(getMobileIndexFromCurrentIndex());
   } else {
     renderDesktopSpread(getDesktopIndexFromCurrentIndex());
@@ -270,6 +275,10 @@ function handleSingleTap(clientX) {
 }
 
 function resetPanState() {
+  if (currentPanImage) {
+    currentPanImage.style.setProperty("--pan-x", "0px");
+    currentPanImage.style.setProperty("--pan-y", "0px");
+  }
   panOffsetX = 0;
   panMinX = 0;
   panOffsetY = 0;
@@ -279,6 +288,7 @@ function resetPanState() {
   panPointerActive = false;
   panPointerId = null;
   autoplayDirection = -1;
+  autoplayAxis = "x";
   currentPanImage = null;
 }
 
@@ -297,7 +307,10 @@ function stopAutoplay() {
 }
 
 function autoplayStep(timestamp) {
-  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
+  const canAutoPanX = panMinX < 0;
+  const canAutoPanY = panMinY < 0;
+
+  if (!isFullscreenActive() || !currentPanImage || (!canAutoPanX && !canAutoPanY) || panPointerActive) {
     autoplayFrameId = null;
     return;
   }
@@ -309,13 +322,26 @@ function autoplayStep(timestamp) {
   const deltaTime = timestamp - lastAutoplayTimestamp;
   lastAutoplayTimestamp = timestamp;
   const halfCycleMs = AUTOPLAY_CYCLE_MS / 2;
-  const pixelsPerMs = Math.abs(panMinX) / halfCycleMs;
+  const axisDistance = autoplayAxis === "y" ? Math.abs(panMinY) : Math.abs(panMinX);
+  const pixelsPerMs = axisDistance / halfCycleMs;
 
   if (pixelsPerMs > 0) {
-    applyPanOffset(panOffsetX + autoplayDirection * pixelsPerMs * deltaTime, panOffsetY);
+    if (autoplayAxis === "y") {
+      applyPanOffset(panOffsetX, panOffsetY + autoplayDirection * pixelsPerMs * deltaTime);
+    } else {
+      applyPanOffset(panOffsetX + autoplayDirection * pixelsPerMs * deltaTime, panOffsetY);
+    }
   }
 
-  if (panOffsetX <= panMinX) {
+  if (autoplayAxis === "y") {
+    if (panOffsetY <= panMinY) {
+      applyPanOffset(panOffsetX, panMinY);
+      autoplayDirection = 1;
+    } else if (panOffsetY >= 0) {
+      applyPanOffset(panOffsetX, 0);
+      autoplayDirection = -1;
+    }
+  } else if (panOffsetX <= panMinX) {
     applyPanOffset(panMinX, panOffsetY);
     autoplayDirection = 1;
   } else if (panOffsetX >= 0) {
@@ -329,7 +355,7 @@ function autoplayStep(timestamp) {
 function scheduleAutoplay() {
   stopAutoplay();
 
-  if (!isFullscreenActive() || !currentPanImage || panMinX >= 0 || panPointerActive) {
+  if (!isFullscreenActive() || !currentPanImage || (panMinX >= 0 && panMinY >= 0) || panPointerActive) {
     return;
   }
 
@@ -378,6 +404,7 @@ function setupFullscreenPan(shouldScheduleAutoplay = true) {
 
   panMinX = -overflowX;
   panMinY = -overflowY;
+  autoplayAxis = isTouchFullscreenMode() && window.innerWidth > window.innerHeight && overflowY > 0 ? "y" : "x";
   applyPanOffset(overflowX > 0 ? panOffsetX : 0, overflowY > 0 ? panOffsetY : 0);
 
   if (shouldScheduleAutoplay) {
@@ -703,6 +730,9 @@ mobileMediaQuery.addEventListener("change", (event) => {
 
 window.addEventListener("resize", () => {
   setupFullscreenPan();
+  if (!isFullscreenActive()) {
+    render();
+  }
 });
 
 document.addEventListener("fullscreenchange", syncFullscreenState);
