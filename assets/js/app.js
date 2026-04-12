@@ -1,7 +1,7 @@
 const totalPages = 11;
 const pages = Array.from({ length: totalPages }, (_, index) => {
   const pageNumber = String(index + 1).padStart(4, "0");
-  return `comics/Cinderella-2026-${pageNumber}.png`;
+  return `comics/Zolushka-2026-${pageNumber}.png`;
 });
 
 const spreads = buildSpreads(pages);
