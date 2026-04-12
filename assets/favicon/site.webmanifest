@@ -1,6 +1,9 @@
 {
   "name": "Toterstern",
   "short_name": "Toterstern",
+  "description": "A gothic online reader for the comic Cinderella.",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/assets/favicon/icon-192.png",
