@@ -443,10 +443,8 @@ function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
 
   panOffsetX = Math.max(panMinX - PAN_OVERSCROLL_PX, Math.min(PAN_OVERSCROLL_PX, nextOffsetX));
   panOffsetY = Math.max(panMinY - PAN_OVERSCROLL_PX, Math.min(PAN_OVERSCROLL_PX, nextOffsetY));
-  const renderedOffsetX = zoomScale > 1 ? panOffsetX / zoomScale : panOffsetX;
-  const renderedOffsetY = zoomScale > 1 ? panOffsetY / zoomScale : panOffsetY;
-  currentPanImage.style.setProperty("--pan-x", `${renderedOffsetX}px`);
-  currentPanImage.style.setProperty("--pan-y", `${renderedOffsetY}px`);
+  currentPanImage.style.setProperty("--pan-x", `${panOffsetX}px`);
+  currentPanImage.style.setProperty("--pan-y", `${panOffsetY}px`);
   syncEdgePromptForZoom();
 }
 
