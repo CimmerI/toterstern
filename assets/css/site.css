@@ -165,6 +165,43 @@ body::before {
   font-size: 1.7rem;
 }
 
+.zoom-edge-action {
+  position: absolute;
+  left: 50%;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 128px;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.84);
+  color: var(--text);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 180ms ease;
+}
+
+.zoom-edge-action.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.zoom-edge-action-top {
+  top: 16px;
+}
+
+.zoom-edge-action-bottom {
+  bottom: 16px;
+}
+
 .page-shell.is-fullscreen .fullscreen-toggle-open {
   display: none;
 }
@@ -208,6 +245,7 @@ body::before {
 .comic-page {
   --pan-x: 0px;
   --pan-y: 0px;
+  --zoom-scale: 1;
   display: block;
   width: min(100%, 540px);
   max-height: 74vh;
@@ -219,6 +257,7 @@ body::before {
     0 0 28px rgba(177, 31, 42, 0.2);
   background: var(--panel);
   translate: var(--pan-x) var(--pan-y);
+  scale: var(--zoom-scale);
 }
 
 .page-slot.left .comic-page {

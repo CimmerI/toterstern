@@ -17,6 +17,8 @@ const nextButton = document.getElementById("next-button");
 const tapLeft = document.getElementById("tap-left");
 const tapRight = document.getElementById("tap-right");
 const fullscreenToggleButton = document.getElementById("fullscreen-toggle");
+const zoomPrevEdgeButton = document.getElementById("zoom-prev-edge");
+const zoomNextEdgeButton = document.getElementById("zoom-next-edge");
 let previousSinglePageMode = mobileMediaQuery.matches;
 
 let currentIndex = 0;
@@ -48,11 +50,21 @@ let autoplayResumeTimeoutId = null;
 let lastAutoplayTimestamp = 0;
 let autoplayDirection = -1;
 let autoplayAxis = "x";
+let zoomScale = 1;
+let pinchTracking = false;
+let pinchStartDistance = 0;
+let pinchStartScale = 1;
+let edgePromptTimeoutId = null;
+let visibleEdgePrompt = null;
+let pendingZoomRestore = null;
 const AUTOPLAY_RESUME_DELAY = 1800;
 const AUTOPLAY_CYCLE_MS = 18000;
 const PAN_OVERSCROLL_PX = 10;
 const FAST_SWIPE_DURATION_MS = 180;
 const FAST_SWIPE_DISTANCE_PX = 120;
+const EDGE_PROMPT_DELAY_MS = 2000;
+const MIN_ZOOM_SCALE = 1;
+const MAX_ZOOM_SCALE = 2;
 
 function buildSpreads(pageList) {
   const result = [];
@@ -293,6 +305,10 @@ async function toggleFullscreen() {
 }
 
 function handleSingleTap(clientX) {
+  if (isTouchFullscreenMode() && zoomScale > 1) {
+    return;
+  }
+
   const viewportBoundary = isMobilePortraitReader()
     ? window.innerWidth / 2
     : window.innerWidth / 3;
@@ -311,6 +327,7 @@ function resetPanState() {
   if (currentPanImage) {
     currentPanImage.style.setProperty("--pan-x", "0px");
     currentPanImage.style.setProperty("--pan-y", "0px");
+    currentPanImage.style.setProperty("--zoom-scale", "1");
   }
   panOffsetX = 0;
   panMinX = 0;
@@ -323,6 +340,13 @@ function resetPanState() {
   autoplayDirection = -1;
   autoplayAxis = "x";
   currentPanImage = null;
+  zoomScale = 1;
+  pinchTracking = false;
+  pinchStartDistance = 0;
+  pinchStartScale = 1;
+  pendingZoomRestore = null;
+  hideEdgePrompts();
+  clearEdgePromptTimeout();
 }
 
 function stopAutoplay() {
@@ -406,6 +430,8 @@ function scheduleAutoplay() {
 
 function registerManualPanIntent() {
   stopAutoplay();
+  clearEdgePromptTimeout();
+  hideEdgePrompts();
 }
 
 function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
@@ -415,8 +441,11 @@ function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
 
   panOffsetX = Math.max(panMinX - PAN_OVERSCROLL_PX, Math.min(PAN_OVERSCROLL_PX, nextOffsetX));
   panOffsetY = Math.max(panMinY - PAN_OVERSCROLL_PX, Math.min(PAN_OVERSCROLL_PX, nextOffsetY));
-  currentPanImage.style.setProperty("--pan-x", `${panOffsetX}px`);
-  currentPanImage.style.setProperty("--pan-y", `${panOffsetY}px`);
+  const renderedOffsetX = zoomScale > 1 ? panOffsetX / zoomScale : panOffsetX;
+  const renderedOffsetY = zoomScale > 1 ? panOffsetY / zoomScale : panOffsetY;
+  currentPanImage.style.setProperty("--pan-x", `${renderedOffsetX}px`);
+  currentPanImage.style.setProperty("--pan-y", `${renderedOffsetY}px`);
+  syncEdgePromptForZoom();
 }
 
 function setupFullscreenPan(shouldScheduleAutoplay = true) {
@@ -436,21 +465,39 @@ function setupFullscreenPan(shouldScheduleAutoplay = true) {
   }
 
   currentPanImage = visibleImage;
+  currentPanImage.style.setProperty("--zoom-scale", String(isTouchFullscreenMode() ? zoomScale : 1));
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const imageWidth = visibleImage.offsetWidth;
   const imageHeight = visibleImage.offsetHeight;
-  const overflowX = Math.max(0, imageWidth - viewportWidth);
-  const overflowY = Math.max(0, imageHeight - viewportHeight);
+  const effectiveZoom = isTouchFullscreenMode() ? zoomScale : 1;
+  const scaledWidth = imageWidth * effectiveZoom;
+  const scaledHeight = imageHeight * effectiveZoom;
+  const overflowX = Math.max(0, scaledWidth - viewportWidth);
+  const overflowY = Math.max(0, scaledHeight - viewportHeight);
 
   panMinX = isPortraitMobileFullscreen() ? 0 : -overflowX;
   panMinY = isPortraitMobileFullscreen() ? 0 : -overflowY;
+  if (isTouchFullscreenMode() && zoomScale > 1) {
+    panMinX = -overflowX;
+    panMinY = -overflowY;
+  }
   autoplayAxis = isTouchFullscreenMode() && window.innerWidth > window.innerHeight && overflowY > 0 ? "y" : "x";
-  applyPanOffset(
-    overflowX > 0 && !isPortraitMobileFullscreen() ? panOffsetX : 0,
-    overflowY > 0 && !isPortraitMobileFullscreen() ? panOffsetY : 0
-  );
+  if (pendingZoomRestore && isTouchFullscreenMode()) {
+    zoomScale = clampZoomScale(pendingZoomRestore.scale);
+    currentPanImage.style.setProperty("--zoom-scale", String(zoomScale));
+    applyPanOffset(
+      pendingZoomRestore.x ?? 0,
+      pendingZoomRestore.edge === "bottom" ? panMinY : 0
+    );
+    pendingZoomRestore = null;
+  } else {
+    applyPanOffset(
+      overflowX > 0 && (!isPortraitMobileFullscreen() || zoomScale > 1) ? panOffsetX : 0,
+      overflowY > 0 && (!isPortraitMobileFullscreen() || zoomScale > 1) ? panOffsetY : 0
+    );
+  }
 
   if (shouldScheduleAutoplay) {
     scheduleAutoplay();
@@ -549,6 +596,42 @@ fullscreenToggleButton.addEventListener("click", (event) => {
   registerManualPanIntent();
   toggleFullscreen();
 });
+zoomPrevEdgeButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (!isTouchFullscreenMode() || zoomScale <= 1 || currentIndex === 0) {
+    return;
+  }
+
+  pendingZoomRestore = {
+    scale: zoomScale,
+    edge: "bottom",
+    x: panOffsetX,
+  };
+  clearEdgePromptTimeout();
+  hideEdgePrompts();
+  currentEnterDirection = "back";
+  goTo(currentIndex - 1);
+});
+zoomNextEdgeButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (!isTouchFullscreenMode() || zoomScale <= 1 || currentIndex >= pages.length - 1) {
+    return;
+  }
+
+  pendingZoomRestore = {
+    scale: zoomScale,
+    edge: "top",
+    x: panOffsetX,
+  };
+  clearEdgePromptTimeout();
+  hideEdgePrompts();
+  currentEnterDirection = "forward";
+  goTo(currentIndex + 1);
+});
 reader.addEventListener("wheel", handleWheelNavigation, { passive: false });
 reader.addEventListener("mousemove", () => {
   if (isFullscreenActive()) {
@@ -601,6 +684,16 @@ reader.addEventListener("pointercancel", () => {
 spreadRoot.addEventListener(
   "touchstart",
   (event) => {
+    if (event.touches.length === 2 && isTouchFullscreenMode()) {
+      touchTracking = false;
+      panPointerActive = false;
+      pinchTracking = true;
+      pinchStartDistance = getTouchDistance(event.touches[0], event.touches[1]);
+      pinchStartScale = zoomScale;
+      registerManualPanIntent();
+      return;
+    }
+
     if (event.touches.length !== 1) {
       touchTracking = false;
       return;
@@ -622,6 +715,18 @@ spreadRoot.addEventListener(
 spreadRoot.addEventListener(
   "touchmove",
   (event) => {
+    if (pinchTracking && event.touches.length === 2 && isTouchFullscreenMode()) {
+      event.preventDefault();
+      const nextDistance = getTouchDistance(event.touches[0], event.touches[1]);
+      const nextScale = clampZoomScale((nextDistance / pinchStartDistance) * pinchStartScale);
+
+      if (Math.abs(nextScale - zoomScale) > 0.005) {
+        zoomScale = nextScale;
+        setupFullscreenPan(false);
+      }
+      return;
+    }
+
     if (!touchTracking || event.touches.length !== 1) {
       return;
     }
@@ -635,7 +740,7 @@ spreadRoot.addEventListener(
 
     if (
       isFullscreenActive() &&
-      !isPortraitMobileFullscreen() &&
+      (!isPortraitMobileFullscreen() || zoomScale > 1) &&
       isTouchLayout() &&
       currentPanImage &&
       (panMinX < 0 || panMinY < 0)
@@ -650,6 +755,15 @@ spreadRoot.addEventListener(
 spreadRoot.addEventListener(
   "touchend",
   (event) => {
+    if (pinchTracking) {
+      if (event.touches.length < 2) {
+        pinchTracking = false;
+        setupFullscreenPan(false);
+        syncEdgePromptForZoom();
+      }
+      return;
+    }
+
     if (!touchTracking || event.changedTouches.length !== 1) {
       touchTracking = false;
       return;
@@ -703,7 +817,7 @@ spreadRoot.addEventListener(
 
     if (
       isFullscreenActive() &&
-      !isPortraitMobileFullscreen() &&
+      (!isPortraitMobileFullscreen() || zoomScale > 1) &&
       isTouchLayout() &&
       currentPanImage &&
       (panMinX < 0 || panMinY < 0) &&
@@ -817,3 +931,62 @@ document.addEventListener("fullscreenchange", syncFullscreenState);
 syncFullscreenToggleButton();
 syncFullscreenState();
 render();
+
+function clearEdgePromptTimeout() {
+  if (edgePromptTimeoutId) {
+    clearTimeout(edgePromptTimeoutId);
+    edgePromptTimeoutId = null;
+  }
+}
+
+function hideEdgePrompts() {
+  visibleEdgePrompt = null;
+  zoomPrevEdgeButton.classList.remove("is-visible");
+  zoomNextEdgeButton.classList.remove("is-visible");
+}
+
+function showEdgePrompt(direction) {
+  hideEdgePrompts();
+  visibleEdgePrompt = direction;
+
+  if (direction === "back") {
+    zoomPrevEdgeButton.classList.add("is-visible");
+  }
+
+  if (direction === "forward") {
+    zoomNextEdgeButton.classList.add("is-visible");
+  }
+}
+
+function clampZoomScale(value) {
+  return Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE, value));
+}
+
+function getTouchDistance(touchA, touchB) {
+  return Math.hypot(touchB.clientX - touchA.clientX, touchB.clientY - touchA.clientY);
+}
+
+function syncEdgePromptForZoom() {
+  clearEdgePromptTimeout();
+  hideEdgePrompts();
+
+  if (!isTouchFullscreenMode() || zoomScale <= 1 || !currentPanImage || panMinY >= 0) {
+    return;
+  }
+
+  let nextPrompt = null;
+
+  if (panOffsetY <= panMinY + 1 && currentIndex < pages.length - 1) {
+    nextPrompt = "forward";
+  } else if (panOffsetY >= -1 && currentIndex > 0) {
+    nextPrompt = "back";
+  }
+
+  if (!nextPrompt) {
+    return;
+  }
+
+  edgePromptTimeoutId = window.setTimeout(() => {
+    showEdgePrompt(nextPrompt);
+  }, EDGE_PROMPT_DELAY_MS);
+}
