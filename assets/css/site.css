@@ -160,6 +160,14 @@ body::before {
   line-height: 1;
 }
 
+.control-icon {
+  display: block;
+  width: 62%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(177, 31, 42, 0.22));
+}
+
 .fullscreen-toggle-close {
   display: none;
   font-size: 1.7rem;
@@ -187,6 +195,27 @@ body::before {
   pointer-events: none;
   transform: translateX(-50%);
   transition: opacity 180ms ease;
+}
+
+.zoom-edge-action span {
+  line-height: 1;
+}
+
+.zoom-edge-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.zoom-edge-arrow {
+  width: 20px;
+  height: 20px;
+}
+
+.zoom-edge-action {
+  gap: 10px;
 }
 
 .zoom-edge-action.is-visible {
@@ -309,13 +338,6 @@ body::before {
 .nav-button:disabled {
   opacity: 0.3;
   cursor: default;
-}
-
-.nav-button svg {
-  width: 62%;
-  height: 62%;
-  fill: currentColor;
-  filter: drop-shadow(0 0 12px rgba(177, 31, 42, 0.26));
 }
 
 .reader-hint {

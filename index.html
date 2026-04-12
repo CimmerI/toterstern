@@ -20,22 +20,24 @@
 
     <main class="reader" id="top">
       <button class="nav-button nav-button-left" id="prev-button" type="button" aria-label="Previous spread">
-        <svg viewBox="0 0 120 120" aria-hidden="true">
-          <path d="M88 20C67 19 51 27 44 41c-4 8-4 17-2 24l-13-7c-6-3-13 0-15 6s1 12 7 15l38 20c5 3 12 1 15-5l21-38c3-6 1-13-5-16s-13-1-16 5l-8 14c-4-8-3-18 2-26 5-7 14-11 24-11h2c7 0 12-5 12-11S95 20 88 20Z"/>
-        </svg>
+        <img class="control-icon" src="img-int/s-left.png" alt="" aria-hidden="true">
       </button>
 
       <section class="book-stage" aria-label="Comic viewer">
         <div class="book-glow"></div>
         <button class="fullscreen-toggle" id="fullscreen-toggle" type="button" aria-label="Open fullscreen">
-          <span class="fullscreen-toggle-open" aria-hidden="true">⤢</span>
+          <img class="control-icon fullscreen-toggle-open" src="img-int/fullscreen.png" alt="" aria-hidden="true">
           <span class="fullscreen-toggle-close" aria-hidden="true">×</span>
         </button>
         <button class="zoom-edge-action zoom-edge-action-top" id="zoom-prev-edge" type="button">
-          назад
+          <img class="zoom-edge-icon" src="img-int/lupa.png" alt="" aria-hidden="true">
+          <img class="zoom-edge-icon zoom-edge-arrow" src="img-int/s-left.png" alt="" aria-hidden="true">
+          <span>назад</span>
         </button>
         <button class="zoom-edge-action zoom-edge-action-bottom" id="zoom-next-edge" type="button">
-          вперёд
+          <img class="zoom-edge-icon" src="img-int/lupa.png" alt="" aria-hidden="true">
+          <img class="zoom-edge-icon zoom-edge-arrow" src="img-int/s-right.png" alt="" aria-hidden="true">
+          <span>вперёд</span>
         </button>
         <div class="tap-zone tap-zone-left" id="tap-left" aria-hidden="true"></div>
         <div class="tap-zone tap-zone-right" id="tap-right" aria-hidden="true"></div>
@@ -43,9 +45,7 @@
       </section>
 
       <button class="nav-button nav-button-right" id="next-button" type="button" aria-label="Next spread">
-        <svg viewBox="0 0 120 120" aria-hidden="true">
-          <path d="M32 20c21-1 37 7 44 21 4 8 4 17 2 24l13-7c6-3 13 0 15 6s-1 12-7 15L61 99c-5 3-12 1-15-5L25 56c-3-6-1-13 5-16s13-1 16 5l8 14c4-8 3-18-2-26-5-7-14-11-24-11h-2c-7 0-12-5-12-11s5-11 12-11h8Z"/>
-        </svg>
+        <img class="control-icon" src="img-int/s-right.png" alt="" aria-hidden="true">
       </button>
     </main>
 
