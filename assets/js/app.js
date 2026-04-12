@@ -54,6 +54,8 @@ let zoomScale = 1;
 let pinchTracking = false;
 let pinchStartDistance = 0;
 let pinchStartScale = 1;
+let pinchMidpointX = 0;
+let pinchMidpointY = 0;
 let edgePromptTimeoutId = null;
 let visibleEdgePrompt = null;
 let pendingZoomRestore = null;
@@ -448,6 +450,36 @@ function applyPanOffset(nextOffsetX, nextOffsetY = panOffsetY) {
   syncEdgePromptForZoom();
 }
 
+function getTouchMidpoint(touchA, touchB) {
+  return {
+    x: (touchA.clientX + touchB.clientX) / 2,
+    y: (touchA.clientY + touchB.clientY) / 2,
+  };
+}
+
+function applyZoomAtPoint(nextScale, clientX, clientY) {
+  if (!currentPanImage) {
+    zoomScale = nextScale;
+    return;
+  }
+
+  const previousScale = zoomScale;
+
+  if (Math.abs(nextScale - previousScale) < 0.005) {
+    return;
+  }
+
+  const rect = currentPanImage.getBoundingClientRect();
+  const localX = (clientX - rect.left) / previousScale;
+  const localY = (clientY - rect.top) / previousScale;
+  const nextOffsetX = panOffsetX - localX * (nextScale - previousScale);
+  const nextOffsetY = panOffsetY - localY * (nextScale - previousScale);
+
+  zoomScale = nextScale;
+  setupFullscreenPan(false);
+  applyPanOffset(nextOffsetX, nextOffsetY);
+}
+
 function setupFullscreenPan(shouldScheduleAutoplay = true) {
   if (!isFullscreenActive()) {
     resetPanState();
@@ -691,6 +723,9 @@ spreadRoot.addEventListener(
       pinchTracking = true;
       pinchStartDistance = getTouchDistance(event.touches[0], event.touches[1]);
       pinchStartScale = zoomScale;
+      const midpoint = getTouchMidpoint(event.touches[0], event.touches[1]);
+      pinchMidpointX = midpoint.x;
+      pinchMidpointY = midpoint.y;
       registerManualPanIntent();
       return;
     }
@@ -720,10 +755,12 @@ spreadRoot.addEventListener(
       event.preventDefault();
       const nextDistance = getTouchDistance(event.touches[0], event.touches[1]);
       const nextScale = clampZoomScale((nextDistance / pinchStartDistance) * pinchStartScale);
+      const midpoint = getTouchMidpoint(event.touches[0], event.touches[1]);
+      pinchMidpointX = midpoint.x;
+      pinchMidpointY = midpoint.y;
 
       if (Math.abs(nextScale - zoomScale) > 0.005) {
-        zoomScale = nextScale;
-        setupFullscreenPan(false);
+        applyZoomAtPoint(nextScale, pinchMidpointX, pinchMidpointY);
       }
       return;
     }
