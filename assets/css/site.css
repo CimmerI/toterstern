@@ -645,6 +645,18 @@ body::before {
     align-items: center;
   }
 
+  .page-shell.is-fullscreen .spread.is-zoomed {
+    justify-items: start;
+    align-items: start;
+    align-content: start;
+  }
+
+  .page-shell.is-fullscreen .spread.is-zoomed .page-slot,
+  .page-shell.is-fullscreen .spread.is-zoomed .page-slot.mobile-single {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
   .page-shell.is-fullscreen .comic-page {
     width: 100%;
     height: auto;

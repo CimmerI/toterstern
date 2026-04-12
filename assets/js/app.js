@@ -466,6 +466,7 @@ function setupFullscreenPan(shouldScheduleAutoplay = true) {
 
   currentPanImage = visibleImage;
   currentPanImage.style.setProperty("--zoom-scale", String(isTouchFullscreenMode() ? zoomScale : 1));
+  spreadRoot.classList.toggle("is-zoomed", isTouchFullscreenMode() && zoomScale > 1);
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
