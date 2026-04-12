@@ -582,6 +582,14 @@ body::before {
 }
 
 @media (max-width: 640px) and (orientation: portrait) {
+  .tap-zone {
+    pointer-events: none;
+  }
+
+  .nav-button {
+    z-index: 5;
+  }
+
   .page-shell.is-fullscreen .book-stage {
     align-items: center;
   }
