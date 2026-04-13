@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Toterstern Phone</title>
   <style>
+    :root {
+      --bg: #050505;
+      --text: #f4efe5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     html,
     body {
       margin: 0;
@@ -12,17 +21,39 @@
     }
 
     body {
+      position: relative;
       min-height: 100vh;
-      background-color: #050505;
-      background-image: url("img-int/damask_exact_8x8-12.png?v=20260413-2");
-      background-repeat: repeat;
-      background-position: top left;
-      background-size: 314px 314px;
+      background:
+        radial-gradient(circle at top, rgba(177, 31, 42, 0.18), transparent 38%),
+        radial-gradient(circle at bottom, rgba(104, 12, 19, 0.2), transparent 30%),
+        linear-gradient(180deg, #0d0d0d 0%, #020202 100%);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        url("img-int/damask_exact_8x8-12.png?v=20260413-3") repeat top left,
+        linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.035) 50%, transparent 100%),
+        repeating-linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.015) 0,
+          rgba(255, 255, 255, 0.015) 2px,
+          transparent 2px,
+          transparent 14px
+        );
+      background-size: 314px 314px, auto, auto;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.22;
     }
 
     @media (max-width: 640px) {
-      body {
-        background-size: 79px 79px;
+      body::before {
+        background-size: 79px 79px, auto, auto;
       }
     }
   </style>
