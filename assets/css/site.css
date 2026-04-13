@@ -53,7 +53,7 @@ body::before {
 
 @media (max-width: 640px) {
   body::before {
-    background-size: 79px 79px, auto, auto;
+    background-size: 157px 157px, auto, auto;
   }
 }
 
