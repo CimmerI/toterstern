@@ -23,10 +23,7 @@
     body {
       position: relative;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at left center, rgba(177, 31, 42, 0.24), transparent 34%),
-        radial-gradient(circle at right center, rgba(104, 12, 19, 0.24), transparent 34%),
-        linear-gradient(180deg, #0d0d0d 0%, #020202 100%);
+      background: #050505;
       color: var(--text);
       overflow: hidden;
     }
@@ -35,20 +32,10 @@
       content: "";
       position: fixed;
       inset: 0;
-      background:
-        url("img-int/damask_exact_8x8-14.png?v=20260413-4") repeat top left,
-        linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.035) 50%, transparent 100%),
-        repeating-linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.015) 0,
-          rgba(255, 255, 255, 0.015) 2px,
-          transparent 2px,
-          transparent 14px
-        );
-      background-size: 314px 314px, auto, auto;
+      background: url("img-int/damask_exact_8x8-14.png?v=20260413-5") repeat top left;
+      background-size: 314px 314px;
       pointer-events: none;
-      mix-blend-mode: screen;
-      opacity: 0.22;
+      opacity: 0.2;
     }
 
     @media (max-width: 640px) {
@@ -57,9 +44,8 @@
       }
 
       body::before {
-        background-size: 157px 157px, auto, auto;
-        mix-blend-mode: normal;
-        opacity: 0.14;
+        background-size: 157px 157px;
+        opacity: 0.2;
       }
     }
   </style>
