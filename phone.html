@@ -23,7 +23,8 @@
     body {
       position: relative;
       min-height: 100vh;
-      background: #050505;
+      background: #050505 url("img-int/damask_exact_8x8-14.png?v=20260413-8") repeat top left;
+      background-size: 314px 314px;
       color: var(--text);
       overflow: hidden;
     }
@@ -32,20 +33,17 @@
       content: "";
       position: fixed;
       inset: 0;
-      background: url("img-int/damask_exact_8x8-14.png?v=20260413-5") repeat top left;
-      background-size: 314px 314px;
+      background:
+        radial-gradient(circle at left center, rgba(177, 31, 42, 0.24), transparent 34%),
+        radial-gradient(circle at right center, rgba(104, 12, 19, 0.24), transparent 34%);
       pointer-events: none;
-      opacity: 0.2;
     }
 
     @media (max-width: 640px) {
       body {
-        background: #050505;
-      }
-
-      body::before {
+        background:
+          #050505 url("img-int/damask_exact_8x8-14.png?v=20260413-8") repeat top left;
         background-size: 157px 157px;
-        opacity: 0.2;
       }
     }
   </style>
