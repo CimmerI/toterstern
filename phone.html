@@ -14,10 +14,16 @@
     body {
       min-height: 100vh;
       background-color: #050505;
-      background-image: url("img-int/damask_exact_8x8-12.png");
+      background-image: url("img-int/damask_exact_8x8-12.png?v=20260413-2");
       background-repeat: repeat;
       background-position: top left;
-      background-size: auto;
+      background-size: 314px 314px;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        background-size: 79px 79px;
+      }
     }
   </style>
 </head>
