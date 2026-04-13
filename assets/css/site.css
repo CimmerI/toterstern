@@ -54,6 +54,7 @@ body::before {
 @media (max-width: 640px) {
   body::before {
     background-size: 157px 157px, auto, auto;
+    opacity: 0.34;
   }
 }
 
