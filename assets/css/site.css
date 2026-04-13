@@ -52,6 +52,10 @@ body::before {
 }
 
 @media (max-width: 640px) {
+  body {
+    background: #050505;
+  }
+
   body::before {
     background-size: 157px 157px, auto, auto;
     mix-blend-mode: normal;
