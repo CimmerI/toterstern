@@ -32,7 +32,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: url("../../img-int/damask_exact_8x8-14.png") repeat top left;
+  background: url("../../img-int/damask_exact_8x8-14-dark.png") repeat top left;
   background-size: 314px 314px;
   pointer-events: none;
   opacity: 0.2;
