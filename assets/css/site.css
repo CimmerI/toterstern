@@ -36,6 +36,7 @@ body::before {
   position: fixed;
   inset: 0;
   background:
+    url("../../img-int/damask_exact_8x8-12.png") repeat top left,
     linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.035) 50%, transparent 100%),
     repeating-linear-gradient(
       135deg,
@@ -44,9 +45,16 @@ body::before {
       transparent 2px,
       transparent 14px
     );
+  background-size: 314px 314px, auto, auto;
   pointer-events: none;
   mix-blend-mode: screen;
-  opacity: 0.4;
+  opacity: 0.22;
+}
+
+@media (max-width: 640px) {
+  body::before {
+    background-size: 79px 79px, auto, auto;
+  }
 }
 
 .page-shell {
