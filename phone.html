@@ -8,6 +8,8 @@
     :root {
       --bg: #050505;
       --text: #f4efe5;
+      --strip-width: min(100vw, 640px);
+      --tile-size: calc(var(--strip-width) / 2);
     }
 
     * {
@@ -26,7 +28,7 @@
       background: #050505 url("img-int/damask_exact_8x8-14-dark.png?v=20260414-1") repeat top left;
       background-size: 314px 314px;
       color: var(--text);
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     body::before {
@@ -39,6 +41,44 @@
       pointer-events: none;
     }
 
+    .quad-strip {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: var(--tile-size);
+      width: var(--strip-width);
+      min-height: 100vh;
+      margin: 0 auto;
+    }
+
+    .tile {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("img-int/tile_1024x1024opt.png?v=20260417-1");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100% 100%;
+    }
+
+    .tile.flip-x::before {
+      transform: scaleX(-1);
+    }
+
+    .tile.flip-y::before {
+      transform: scaleY(-1);
+    }
+
+    .tile.flip-xy::before {
+      transform: scale(-1, -1);
+    }
+
     @media (max-width: 640px) {
       body {
         background:
@@ -49,5 +89,44 @@
   </style>
 </head>
 <body>
+  <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
+  <script>
+    (() => {
+      const strip = document.getElementById("quad-strip");
+      const columns = 2;
+
+      const getVariant = (x, y) => {
+        if (x % 2 === 0 && y % 2 === 0) return "tile";
+        if (x % 2 === 1 && y % 2 === 0) return "tile flip-x";
+        if (x % 2 === 0 && y % 2 === 1) return "tile flip-y";
+        return "tile flip-xy";
+      };
+
+      const renderQuadTileGrid = () => {
+        const stripWidth = strip.clientWidth;
+        const tileSize = stripWidth / columns;
+        const rows = Math.ceil(window.innerHeight / tileSize) + 1;
+
+        strip.replaceChildren();
+
+        for (let y = 0; y < rows; y += 1) {
+          for (let x = 0; x < columns; x += 1) {
+            const cell = document.createElement("div");
+            cell.className = getVariant(x, y);
+            strip.appendChild(cell);
+          }
+        }
+      };
+
+      let resizeFrame = 0;
+      const scheduleRender = () => {
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(renderQuadTileGrid);
+      };
+
+      window.addEventListener("resize", scheduleRender, { passive: true });
+      renderQuadTileGrid();
+    })();
+  </script>
 </body>
 </html>
