@@ -80,6 +80,10 @@
     }
 
     @media (max-width: 640px) {
+      :root {
+        --tile-size: calc(var(--strip-width) / 2 * 0.75);
+      }
+
       body {
         background:
           #050505 url("img-int/damask_exact_8x8-14-dark.png?v=20260414-1") repeat top left;
