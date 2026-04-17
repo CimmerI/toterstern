@@ -79,11 +79,19 @@
       transform: scale(-1, -1);
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 640px) and (orientation: portrait) {
+      :root {
+        --tile-size: calc(var(--strip-width) / 2 * 0.5);
+      }
+    }
+
+    @media (max-width: 640px) and (orientation: landscape) {
       :root {
         --tile-size: calc(var(--strip-width) / 2 * 0.75);
       }
+    }
 
+    @media (max-width: 640px) {
       body {
         background:
           #050505 url("img-int/damask_exact_8x8-14-dark.png?v=20260414-1") repeat top left;
