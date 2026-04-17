@@ -104,7 +104,7 @@
       };
 
       const renderQuadTileGrid = () => {
-        const tileSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--tile-size"));
+        const tileSize = strip.clientWidth / columns;
         const rows = Math.ceil(window.innerHeight / tileSize) + 1;
 
         strip.replaceChildren();
