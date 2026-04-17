@@ -8,7 +8,8 @@
     :root {
       --bg: #050505;
       --text: #f4efe5;
-      --tile-size: 1024px;
+      --page-width: 100vw;
+      --tile-size: calc(var(--page-width) * 0.4);
       --strip-width: calc(var(--tile-size) * 2);
     }
 
@@ -77,18 +78,6 @@
 
     .tile.flip-xy::before {
       transform: scale(-1, -1);
-    }
-
-    @media (max-width: 640px) and (orientation: portrait) {
-      :root {
-        --tile-size: 256px;
-      }
-    }
-
-    @media (max-width: 640px) and (orientation: landscape) {
-      :root {
-        --tile-size: 768px;
-      }
     }
 
     @media (max-width: 640px) {
