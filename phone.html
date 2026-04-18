@@ -9,8 +9,9 @@
       --bg: #050505;
       --text: #f4efe5;
       --page-width: 100vw;
-      --tile-size: calc(var(--page-width) * 0.4);
+      --tile-size: calc(var(--page-width) * 0.36);
       --strip-width: calc(var(--tile-size) * 2);
+      --bar-width: calc(var(--page-width) * 0.8);
       --strip-top-gap: 5vh;
     }
 
@@ -43,6 +44,25 @@
       pointer-events: none;
     }
 
+    .phone-stage {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: -5vh;
+      left: 50%;
+      z-index: 2;
+      display: block;
+      width: var(--bar-width);
+      height: auto;
+      margin: 0 auto;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
     .quad-strip {
       position: relative;
       z-index: 1;
@@ -69,6 +89,16 @@
       background-size: 100% 100%;
     }
 
+    .tile.tile-top::before {
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    }
+
+    .tile.tile-second::before {
+      -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.51) 0%, rgba(0, 0, 0, 1) 100%);
+      mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.51) 0%, rgba(0, 0, 0, 1) 100%);
+    }
+
     .tile.flip-x::before {
       transform: scaleX(-1);
     }
@@ -91,7 +121,10 @@
   </style>
 </head>
 <body>
-  <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
+  <div class="phone-stage">
+    <img class="top-bar" src="img-int/toter-bar.png?v=20260418-1" alt="" aria-hidden="true">
+    <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
+  </div>
   <script>
     (() => {
       const strip = document.getElementById("quad-strip");
@@ -114,6 +147,11 @@
           for (let x = 0; x < columns; x += 1) {
             const cell = document.createElement("div");
             cell.className = getVariant(x, y);
+            if (y === 0) {
+              cell.classList.add("tile-top");
+            } else if (y === 1) {
+              cell.classList.add("tile-second");
+            }
             strip.appendChild(cell);
           }
         }
