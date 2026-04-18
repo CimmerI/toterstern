@@ -89,16 +89,6 @@
       background-size: 100% 100%;
     }
 
-    .tile.tile-top::before {
-      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
-      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
-    }
-
-    .tile.tile-second::before {
-      -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.51) 0%, rgba(0, 0, 0, 1) 100%);
-      mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.51) 0%, rgba(0, 0, 0, 1) 100%);
-    }
-
     .tile.flip-x::before {
       transform: scaleX(-1);
     }
@@ -121,7 +111,7 @@
 </head>
 <body>
   <div class="phone-stage">
-    <img class="top-bar" src="img-int/toter-bar2.png?v=20260419-1" alt="" aria-hidden="true">
+    <img class="top-bar" src="img-int/toter-bar3.png?v=20260419-1" alt="" aria-hidden="true">
     <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
   </div>
   <script>
@@ -146,11 +136,6 @@
           for (let x = 0; x < columns; x += 1) {
             const cell = document.createElement("div");
             cell.className = getVariant(x, y);
-            if (y === 0) {
-              cell.classList.add("tile-top");
-            } else if (y === 1) {
-              cell.classList.add("tile-second");
-            }
             strip.appendChild(cell);
           }
         }
