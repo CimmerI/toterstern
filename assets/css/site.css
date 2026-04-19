@@ -79,7 +79,7 @@ body::before {
 
 .site-preloader-video {
   display: block;
-  width: min(30vw, 220px);
+  width: min(14vw, 96px);
   max-width: 72vw;
   height: auto;
 }
