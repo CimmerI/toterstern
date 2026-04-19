@@ -1,3 +1,13 @@
+@font-face {
+  font-family: "Toterstern";
+  src:
+    url("../../fonts/Totersternf-Regular.woff2") format("woff2"),
+    url("../../fonts/Totersternf-Regular.woff") format("woff");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
 :root {
   --bg: #050505;
   --bg-soft: #101010;
@@ -119,7 +129,7 @@ body::before {
 .site-mark {
   color: var(--text);
   text-decoration: none;
-  font-family: "Old English Text MT", "UnifrakturCook", Georgia, serif;
+  font-family: "Toterstern", "Old English Text MT", "UnifrakturCook", Georgia, serif;
   font-size: clamp(2rem, 4vw, 3.6rem);
   letter-spacing: 0.05em;
   text-shadow: 0 0 22px rgba(177, 31, 42, 0.28);
