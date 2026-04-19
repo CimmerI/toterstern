@@ -15,6 +15,16 @@
       --strip-top-gap: 5vh;
     }
 
+    @font-face {
+      font-family: "Toterstern";
+      src:
+        url("fonts/Totersternf-Regular.woff2") format("woff2"),
+        url("fonts/Totersternf-Regular.woff") format("woff");
+      font-display: swap;
+      font-style: normal;
+      font-weight: 400;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -131,10 +141,36 @@
       transform: scale(-1, -1);
     }
 
+    .story-note {
+      position: relative;
+      z-index: 3;
+      width: min(78vw, 720px);
+      margin: calc(48px - 100dvh - (var(--tile-size) * 2)) auto 12vh;
+      padding: clamp(18px, 4vw, 34px);
+      color: rgba(244, 239, 229, 0.9);
+      font-family: "Toterstern", Georgia, "Times New Roman", serif;
+      font-size: clamp(1rem, 2.6vw, 1.35rem);
+      line-height: 1.58;
+      text-wrap: pretty;
+    }
+
+    .story-note p {
+      margin: 0;
+    }
+
+    .story-note p + p {
+      margin-top: 1em;
+    }
+
     @media (max-width: 640px) {
       body {
         background: #050505 url("img-int/damask_exact_8x8-14-dark.png?v=20260414-1") repeat top left;
         background-size: 157px 157px;
+      }
+
+      .story-note {
+        width: min(86vw, 520px);
+        margin-top: calc(48px - 100dvh - (var(--tile-size) * 2));
       }
     }
   </style>
@@ -146,6 +182,12 @@
   <div class="phone-stage">
     <img class="top-bar" src="img-int/toter-bar4.png?v=20260419-2" alt="" aria-hidden="true">
     <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
+    <article class="story-note" aria-label="Аннотация к графической новелле">
+      <p>Забудьте всё, что вы знали о Золушке. Её жизнь совсем не похожа на ту милую сказку, которую передавали в народе из поколения в поколение. Золушка не так глупа, чтобы дать неприглядной правде просочиться наружу.</p>
+      <p>В графической новелле «Золушка. Кровавый рассвет» нет однозначных героев — каждый персонаж имеет свои особенности и недостатки. Золушка умна и амбициозна, но куда её это приведёт?</p>
+      <p>Это не романтическая новелла, а трагедия о падении человеческой души, о цене, которую готовы платить люди ради достижения своих целей — будь то любовь, могущество или признание.</p>
+      <p>Узнайте, чем для Золушки обернутся её мечты, в моём авторском комиксе.</p>
+    </article>
   </div>
   <script>
     (() => {
@@ -161,7 +203,12 @@
 
       const renderQuadTileGrid = () => {
         const tileSize = strip.clientWidth / columns;
-        const rows = Math.ceil(window.innerHeight / tileSize) + 1;
+        const pageHeight = Math.max(
+          window.innerHeight,
+          document.documentElement.scrollHeight,
+          document.body.scrollHeight
+        );
+        const rows = Math.ceil(pageHeight / tileSize) + 1;
 
         strip.replaceChildren();
 
@@ -186,6 +233,7 @@
       window.addEventListener("resize", scheduleRender, { passive: true });
       window.addEventListener("load", () => {
         document.getElementById("site-preloader")?.classList.add("is-hidden");
+        scheduleRender();
       });
       renderQuadTileGrid();
     })();
