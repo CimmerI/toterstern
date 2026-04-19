@@ -79,9 +79,11 @@ window.addEventListener("load", () => {
 
 function showSitePreloader() {
   sitePreloader?.classList.remove("is-hidden");
+  sitePreloader?.classList.add("is-visible");
 }
 
 function hideSitePreloader() {
+  sitePreloader?.classList.remove("is-visible");
   sitePreloader?.classList.add("is-hidden");
 }
 

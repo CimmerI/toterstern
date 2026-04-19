@@ -61,7 +61,14 @@ body::before {
   justify-content: center;
   background: transparent;
   pointer-events: none;
-  transition: opacity 420ms ease, visibility 420ms ease;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 500ms ease, visibility 500ms ease;
+}
+
+.site-preloader.is-visible {
+  visibility: visible;
+  opacity: 1;
 }
 
 .site-preloader.is-hidden {
@@ -72,7 +79,7 @@ body::before {
 
 .site-preloader-video {
   display: block;
-  width: min(42vw, 320px);
+  width: min(30vw, 220px);
   max-width: 72vw;
   height: auto;
 }
