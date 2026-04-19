@@ -59,7 +59,8 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #050505;
+  background: transparent;
+  pointer-events: none;
   transition: opacity 420ms ease, visibility 420ms ease;
 }
 
@@ -430,7 +431,7 @@ body::before {
 
 @keyframes page-enter {
   from {
-    opacity: 0;
+    opacity: 1;
     transform: scale(0.985) translateY(12px);
   }
 
@@ -442,7 +443,7 @@ body::before {
 
 @keyframes page-enter-up {
   from {
-    opacity: 0;
+    opacity: 1;
     transform: translateY(70px);
   }
 
@@ -454,7 +455,7 @@ body::before {
 
 @keyframes page-enter-down {
   from {
-    opacity: 0;
+    opacity: 1;
     transform: translateY(-70px);
   }
 

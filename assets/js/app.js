@@ -60,6 +60,8 @@ let pinchMidpointY = 0;
 let edgePromptTimeoutId = null;
 let visibleEdgePrompt = null;
 let pendingZoomRestore = null;
+let renderRequestId = 0;
+let pageTransitionLoading = false;
 const AUTOPLAY_RESUME_DELAY = 1800;
 const AUTOPLAY_CYCLE_MS = 18000;
 const PAN_OVERSCROLL_PX = 10;
@@ -70,8 +72,60 @@ const MIN_ZOOM_SCALE = 1;
 const MAX_ZOOM_SCALE = 2;
 
 window.addEventListener("load", () => {
-  sitePreloader?.classList.add("is-hidden");
+  if (!pageTransitionLoading) {
+    hideSitePreloader();
+  }
 });
+
+function showSitePreloader() {
+  sitePreloader?.classList.remove("is-hidden");
+}
+
+function hideSitePreloader() {
+  sitePreloader?.classList.add("is-hidden");
+}
+
+function waitForNextPaint() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(resolve);
+    });
+  });
+}
+
+function preloadImage(src) {
+  if (!src) {
+    return Promise.resolve();
+  }
+
+  const image = new Image();
+
+  return new Promise((resolve) => {
+    const finish = async () => {
+      try {
+        if (typeof image.decode === "function") {
+          await image.decode();
+        }
+      } catch (_error) {
+        // A failed decode should not block navigation forever.
+      }
+
+      resolve();
+    };
+
+    image.onload = finish;
+    image.onerror = () => resolve();
+    image.src = src;
+
+    if (image.complete) {
+      finish();
+    }
+  });
+}
+
+function preloadImages(srcList) {
+  return Promise.all(srcList.filter(Boolean).map(preloadImage));
+}
 
 function buildSpreads(pageList) {
   const result = [];
@@ -204,14 +258,41 @@ function renderMobilePage(index) {
   nextButton.disabled = index === pages.length - 1;
 }
 
-function render() {
-  syncCurrentIndexForModeChange();
+function getRenderImageSources() {
+  if (isSinglePageMode()) {
+    return [pages[currentIndex]];
+  }
 
+  const spread = spreads[currentIndex];
+  return [spread.left, spread.right].filter(Boolean);
+}
+
+function applyCurrentRender() {
   if (isSinglePageMode()) {
     renderMobilePage(currentIndex);
   } else {
     renderDesktopSpread(currentIndex);
   }
+}
+
+async function render() {
+  syncCurrentIndexForModeChange();
+  const requestId = ++renderRequestId;
+  const imageSources = getRenderImageSources();
+
+  pageTransitionLoading = true;
+  showSitePreloader();
+  await waitForNextPaint();
+  await preloadImages(imageSources);
+
+  if (requestId !== renderRequestId) {
+    return;
+  }
+
+  applyCurrentRender();
+  await waitForNextPaint();
+  pageTransitionLoading = false;
+  hideSitePreloader();
 
   window.requestAnimationFrame(() => {
     setupFullscreenPan();
@@ -219,6 +300,10 @@ function render() {
 }
 
 function goTo(index) {
+  if (pageTransitionLoading) {
+    return;
+  }
+
   if (isSinglePageMode()) {
     currentIndex = Math.max(0, Math.min(index, pages.length - 1));
   } else {
