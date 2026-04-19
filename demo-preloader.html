@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toterstern Preloader Demo</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --text: #f4efe5;
+      --page-width: 100vw;
+      --tile-size: calc(var(--page-width) * 0.36);
+      --strip-width: calc(var(--tile-size) * 2);
+      --bar-width: calc(var(--page-width) * 0.8);
+      --strip-top-gap: 5vh;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      position: relative;
+      min-height: 100vh;
+      background: #050505 url("img-int/damask_exact_8x8-14-dark.png?v=20260414-1") repeat top left;
+      background-size: 314px 314px;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at left center, rgba(177, 31, 42, 0.24), transparent 34%),
+        radial-gradient(circle at right center, rgba(104, 12, 19, 0.24), transparent 34%);
+      pointer-events: none;
+    }
+
+    .site-preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #050505;
+      transition: opacity 420ms ease, visibility 420ms ease;
+    }
+
+    .site-preloader.is-hidden {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .site-preloader-video {
+      display: block;
+      width: min(42vw, 320px);
+      max-width: 72vw;
+      height: auto;
+    }
+
+    .phone-stage {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: -5vh;
+      left: 50%;
+      z-index: 2;
+      display: block;
+      width: var(--bar-width);
+      height: auto;
+      margin: 0 auto;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .quad-strip {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: var(--tile-size);
+      width: var(--strip-width);
+      min-height: calc(100dvh - var(--strip-top-gap));
+      margin: var(--strip-top-gap) auto 0;
+    }
+
+    .tile {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tile::before {
+      content: "";
+      position: absolute;
+      inset: -0.5px;
+      background-image: url("img-int/tile_1024x1024opt.png?v=20260417-1");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100% 100%;
+    }
+
+    .tile.tile-top::before {
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 50%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 50%);
+    }
+
+    .tile.flip-x::before {
+      transform: scaleX(-1);
+    }
+
+    .tile.flip-y::before {
+      transform: scaleY(-1);
+    }
+
+    .tile.flip-xy::before {
+      transform: scale(-1, -1);
+    }
+
+    @media (max-width: 640px) {
+      body {
+        background: #050505 url("img-int/damask_exact_8x8-14-dark.png?v=20260414-1") repeat top left;
+        background-size: 157px 157px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-preloader" id="site-preloader" aria-label="Loading">
+    <video class="site-preloader-video" src="img-int/preloader-dog.webm?v=20260419-1" autoplay muted loop playsinline></video>
+  </div>
+  <div class="phone-stage">
+    <img class="top-bar" src="img-int/toter-bar4.png?v=20260419-2" alt="" aria-hidden="true">
+    <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
+  </div>
+  <script>
+    (() => {
+      const strip = document.getElementById("quad-strip");
+      const columns = 2;
+      const preloaderDurationMs = 60000;
+
+      const getVariant = (x, y) => {
+        if (x % 2 === 0 && y % 2 === 0) return "tile";
+        if (x % 2 === 1 && y % 2 === 0) return "tile flip-x";
+        if (x % 2 === 0 && y % 2 === 1) return "tile flip-y";
+        return "tile flip-xy";
+      };
+
+      const renderQuadTileGrid = () => {
+        const tileSize = strip.clientWidth / columns;
+        const rows = Math.ceil(window.innerHeight / tileSize) + 1;
+
+        strip.replaceChildren();
+
+        for (let y = 0; y < rows; y += 1) {
+          for (let x = 0; x < columns; x += 1) {
+            const cell = document.createElement("div");
+            cell.className = getVariant(x, y);
+            if (y === 0) {
+              cell.classList.add("tile-top");
+            }
+            strip.appendChild(cell);
+          }
+        }
+      };
+
+      let resizeFrame = 0;
+      const scheduleRender = () => {
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(renderQuadTileGrid);
+      };
+
+      window.addEventListener("resize", scheduleRender, { passive: true });
+      window.addEventListener("load", () => {
+        window.setTimeout(() => {
+          document.getElementById("site-preloader")?.classList.add("is-hidden");
+        }, preloaderDurationMs);
+      });
+      renderQuadTileGrid();
+    })();
+  </script>
+</body>
+</html>
