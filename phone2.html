@@ -44,6 +44,30 @@
       pointer-events: none;
     }
 
+    .site-preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #050505;
+      transition: opacity 420ms ease, visibility 420ms ease;
+    }
+
+    .site-preloader.is-hidden {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .site-preloader-video {
+      display: block;
+      width: min(42vw, 320px);
+      max-width: 72vw;
+      height: auto;
+    }
+
     .phone-stage {
       position: relative;
       z-index: 1;
@@ -115,6 +139,9 @@
   </style>
 </head>
 <body>
+  <div class="site-preloader" id="site-preloader" aria-label="Loading">
+    <video class="site-preloader-video" src="img-int/preloader-dog.webm?v=20260419-1" autoplay muted loop playsinline></video>
+  </div>
   <div class="phone-stage">
     <img class="top-bar" src="img-int/toter-bar4.png?v=20260419-2" alt="" aria-hidden="true">
     <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
@@ -156,6 +183,9 @@
       };
 
       window.addEventListener("resize", scheduleRender, { passive: true });
+      window.addEventListener("load", () => {
+        document.getElementById("site-preloader")?.classList.add("is-hidden");
+      });
       renderQuadTileGrid();
     })();
   </script>

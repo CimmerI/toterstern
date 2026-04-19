@@ -16,6 +16,7 @@ const prevButton = document.getElementById("prev-button");
 const nextButton = document.getElementById("next-button");
 const tapLeft = document.getElementById("tap-left");
 const tapRight = document.getElementById("tap-right");
+const sitePreloader = document.getElementById("site-preloader");
 const fullscreenToggleButton = document.getElementById("fullscreen-toggle");
 const zoomPrevEdgeButton = document.getElementById("zoom-prev-edge");
 const zoomNextEdgeButton = document.getElementById("zoom-next-edge");
@@ -67,6 +68,10 @@ const FAST_SWIPE_DISTANCE_PX = 120;
 const EDGE_PROMPT_DELAY_MS = 2000;
 const MIN_ZOOM_SCALE = 1;
 const MAX_ZOOM_SCALE = 2;
+
+window.addEventListener("load", () => {
+  sitePreloader?.classList.add("is-hidden");
+});
 
 function buildSpreads(pageList) {
   const result = [];

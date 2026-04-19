@@ -52,6 +52,30 @@ body::before {
   }
 }
 
+.site-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050505;
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.site-preloader.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.site-preloader-video {
+  display: block;
+  width: min(42vw, 320px);
+  max-width: 72vw;
+  height: auto;
+}
+
 .page-shell {
   position: relative;
   min-height: 100vh;
