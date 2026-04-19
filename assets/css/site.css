@@ -84,6 +84,21 @@ body::before {
   height: auto;
 }
 
+.site-preloader.is-visible .site-preloader-video {
+  animation: preloader-pulse 1s ease-in-out infinite;
+}
+
+@keyframes preloader-pulse {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 .page-shell {
   position: relative;
   min-height: 100vh;
