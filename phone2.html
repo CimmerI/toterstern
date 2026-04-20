@@ -186,6 +186,12 @@
         margin-top: calc(48px - 100dvh - (var(--tile-size) * 2));
       }
     }
+
+    @media (max-width: 900px) and (pointer: coarse) {
+      .tile-border-left {
+        height: calc((100% - var(--border-top-offset)) / 4);
+      }
+    }
   </style>
 </head>
 <body>
@@ -194,7 +200,7 @@
   </div>
   <div class="phone-stage">
     <img class="top-bar" src="img-int/toter-bar4.png?v=20260420-1" alt="" aria-hidden="true">
-    <img class="tile-border-left" src="img-int/bort-l.png?v=20260420-2" alt="" aria-hidden="true">
+    <img class="tile-border-left" src="img-int/bort-l.png?v=20260420-3" alt="" aria-hidden="true">
     <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
     <article class="story-note" aria-label="Аннотация к графической новелле">
       <p>Забудьте всё, что вы знали о Золушке. Её жизнь совсем не похожа на ту милую сказку, которую передавали в народе из поколения в поколение. Золушка не так проста, чтобы дать неприглядной правде просочиться наружу.</p>
