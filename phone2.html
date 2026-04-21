@@ -15,6 +15,11 @@
       --tile-size: calc(var(--page-width) * 0.36);
       --strip-width: calc(var(--tile-size) * 2);
       --bar-width: calc(var(--page-width) * 0.8);
+      --bar-top: 5vh;
+      --bar-height: calc(var(--bar-width) * 3328 / 4992);
+      --story-note-top: calc(var(--bar-top) + var(--bar-height) + 5vh);
+      --window-top-gap: 5vh;
+      --window-width: min(78vw, 720px);
       --strip-top-gap: 5vh;
       --debug-grid: 0;
       --debug-grid-color: rgba(255, 216, 0, 0.22);
@@ -141,7 +146,7 @@
 
     .top-bar {
       position: absolute;
-      top: -5vh;
+      top: var(--bar-top);
       left: 50%;
       z-index: 2;
       display: block;
@@ -156,6 +161,7 @@
       position: relative;
       z-index: 1;
       grid-column: 3 / 13;
+      grid-row: 1;
       justify-self: center;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -197,13 +203,18 @@
       transform: scale(-1, -1);
     }
 
-    .story-note {
+    .story-stack {
       position: relative;
       z-index: 3;
       grid-column: 4 / 12;
+      grid-row: 1;
       justify-self: center;
       width: min(100%, 720px);
-      margin: calc(48px - 100dvh - (var(--tile-size) * 2)) 0 12vh;
+      margin: var(--story-note-top) 0 12vh;
+    }
+
+    .story-note {
+      width: 100%;
       padding: clamp(18px, 4vw, 34px);
       color: rgba(244, 239, 229, 0.9);
       font-family: "Toterstern", Georgia, "Times New Roman", serif;
@@ -220,10 +231,98 @@
       margin-top: 1em;
     }
 
+    .window-scene {
+      position: relative;
+      z-index: 1;
+      width: var(--window-width);
+      aspect-ratio: 2278 / 3008;
+      margin: var(--window-top-gap) auto 0;
+    }
+
+    .window-scene-button {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: var(--cursor-active);
+    }
+
+    .window-scene-button *,
+    .window-scene-button:hover {
+      cursor: var(--cursor-active);
+    }
+
+    .window-scene-character,
+    .window-scene-frame {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .window-scene-character {
+      z-index: 1;
+    }
+
+    .window-scene-frame {
+      z-index: 2;
+    }
+
+    .book-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: clamp(20px, 5vw, 56px);
+      background: rgba(0, 0, 0, 0.82);
+      overflow: auto;
+    }
+
+    .book-modal[hidden] {
+      display: none;
+    }
+
+    .book-modal-close {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(244, 239, 229, 0.3);
+      border-radius: 999px;
+      background: rgba(5, 5, 5, 0.82);
+      color: var(--text);
+      font-size: 1.65rem;
+      line-height: 1;
+      cursor: var(--cursor-active);
+    }
+
+    .book-modal-image {
+      display: block;
+      width: auto;
+      max-width: none;
+      height: auto;
+      margin-inline: auto;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
+      cursor: var(--cursor-active);
+    }
+
     @media (max-width: 640px) {
       :root {
         --page-gutter: 16px;
         --grid-gap: 8px;
+        --window-width: min(100%, 520px);
       }
 
       body {
@@ -232,13 +331,18 @@
       }
 
       .quad-strip,
-      .story-note {
+      .story-stack {
         grid-column: 2 / 14;
       }
 
-      .story-note {
+      .story-stack {
         width: min(100%, 520px);
-        margin-top: calc(48px - 100dvh - (var(--tile-size) * 2));
+        margin-top: var(--story-note-top);
+      }
+
+      .book-modal {
+        justify-content: flex-start;
+        padding: 64px 16px 24px;
       }
     }
 
@@ -251,16 +355,32 @@
   <div class="phone-stage">
     <img class="top-bar" src="img-int/toter-bar4.png?v=20260420-1" alt="" aria-hidden="true">
     <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
-    <article class="story-note" aria-label="Аннотация к графической новелле">
-      <p>Забудьте всё, что вы знали о Золушке. Её жизнь совсем не похожа на ту милую сказку, которую передавали в народе из поколения в поколение. Золушка не так проста, чтобы дать неприглядной правде просочиться наружу.</p>
-      <p>В графической новелле «Золушка. Кровавый восход» нет однозначных героев — каждый персонаж имеет свои тайны и недостатки. Золушка умна и амбициозна, но куда её это приведёт?</p>
-      <p>Это не романтическая новелла, а трагедия о падении человеческой души, о цене, которую готовы платить люди ради достижения своих целей — будь то любовь, могущество или признание.</p>
-      <p>Узнайте, чем для Золушки обернутся её мечты, в моём авторском комиксе.</p>
-    </article>
+    <section class="story-stack">
+      <article class="story-note" aria-label="Аннотация к графической новелле">
+        <p>Забудьте всё, что вы знали о Золушке. Её жизнь совсем не похожа на ту милую сказку, которую передавали в народе из поколения в поколение. Золушка не так проста, чтобы дать неприглядной правде просочиться наружу.</p>
+        <p>В графической новелле «Золушка. Кровавый восход» нет однозначных героев — каждый персонаж имеет свои тайны и недостатки. Золушка умна и амбициозна, но куда её это приведёт?</p>
+        <p>Это не романтическая новелла, а трагедия о падении человеческой души, о цене, которую готовы платить люди ради достижения своих целей — будь то любовь, могущество или признание.</p>
+        <p>Узнайте, чем для Золушки обернутся её мечты, в моём авторском комиксе.</p>
+      </article>
+      <figure class="window-scene" aria-label="Золушка с книгой в декоративном окне">
+        <button class="window-scene-button" id="book-modal-open" type="button" aria-haspopup="dialog" aria-controls="book-modal">
+          <img class="window-scene-character" src="characters/with-a-book-window-cut.png?v=20260421-1" alt="">
+          <img class="window-scene-frame" src="img-int/window01black.png?v=20260421-1" alt="">
+        </button>
+      </figure>
+    </section>
+  </div>
+  <div class="book-modal" id="book-modal" role="dialog" aria-modal="true" aria-label="Иллюстрация с книгой" hidden>
+    <button class="book-modal-close" id="book-modal-close" type="button" aria-label="Закрыть">×</button>
+    <img class="book-modal-image" id="book-modal-image" src="characters/with-a-book.png?v=20260421-1" alt="Золушка с книгой">
   </div>
   <script>
     (() => {
       const strip = document.getElementById("quad-strip");
+      const bookModal = document.getElementById("book-modal");
+      const bookModalOpen = document.getElementById("book-modal-open");
+      const bookModalClose = document.getElementById("book-modal-close");
+      const bookModalImage = document.getElementById("book-modal-image");
       const columns = 2;
 
       const getVariant = (x, y) => {
@@ -304,6 +424,29 @@
         document.getElementById("site-preloader")?.classList.add("is-hidden");
         scheduleRender();
       });
+
+      const openBookModal = () => {
+        bookModal.hidden = false;
+        document.body.style.overflow = "hidden";
+        bookModalClose.focus();
+      };
+
+      const closeBookModal = () => {
+        bookModal.hidden = true;
+        document.body.style.overflow = "";
+        bookModalOpen.focus();
+      };
+
+      bookModalOpen.addEventListener("click", openBookModal);
+      bookModalClose.addEventListener("click", closeBookModal);
+      bookModalImage.addEventListener("dblclick", closeBookModal);
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !bookModal.hidden) {
+          closeBookModal();
+        }
+      });
+
       renderQuadTileGrid();
     })();
   </script>
