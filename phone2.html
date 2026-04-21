@@ -8,11 +8,17 @@
     :root {
       --bg: #050505;
       --text: #f4efe5;
-      --page-width: 100vw;
+      --page-max: 1200px;
+      --page-gutter: clamp(16px, 4vw, 48px);
+      --grid-gap: clamp(8px, 1.6vw, 24px);
+      --page-width: min(100vw, calc(var(--page-max) + (var(--page-gutter) * 2)));
       --tile-size: calc(var(--page-width) * 0.36);
       --strip-width: calc(var(--tile-size) * 2);
       --bar-width: calc(var(--page-width) * 0.8);
       --strip-top-gap: 5vh;
+      --debug-grid: 1;
+      --debug-grid-color: rgba(255, 216, 0, 0.22);
+      --debug-grid-line: rgba(255, 216, 0, 0.72);
       --cursor-default: url("cursor/Click2-32.png") 0 0, auto;
       --cursor-active: url("cursor/Click-32.png") 0 0, pointer;
     }
@@ -101,7 +107,36 @@
     .phone-stage {
       position: relative;
       z-index: 1;
+      display: grid;
+      grid-template-columns: var(--page-gutter) repeat(12, minmax(0, 1fr)) var(--page-gutter);
+      column-gap: var(--grid-gap);
+      width: min(100%, calc(var(--page-max) + (var(--page-gutter) * 2)));
       min-height: 100dvh;
+      margin-inline: auto;
+    }
+
+    .phone-stage::after {
+      content: "";
+      position: fixed;
+      inset: 0 max(0px, calc((100vw - (var(--page-max) + (var(--page-gutter) * 2))) / 2));
+      z-index: 998;
+      pointer-events: none;
+      opacity: var(--debug-grid);
+      background:
+        linear-gradient(
+          to right,
+          transparent 0 var(--page-gutter),
+          var(--debug-grid-line) var(--page-gutter) calc(var(--page-gutter) + 1px),
+          transparent calc(var(--page-gutter) + 1px) calc(100% - var(--page-gutter) - 1px),
+          var(--debug-grid-line) calc(100% - var(--page-gutter) - 1px) calc(100% - var(--page-gutter)),
+          transparent calc(100% - var(--page-gutter)) 100%
+        ),
+        repeating-linear-gradient(
+          to right,
+          transparent 0 var(--page-gutter),
+          var(--debug-grid-color) var(--page-gutter) calc(var(--page-gutter) + ((100% - (var(--page-gutter) * 2) - (var(--grid-gap) * 11)) / 12)),
+          transparent calc(var(--page-gutter) + ((100% - (var(--page-gutter) * 2) - (var(--grid-gap) * 11)) / 12)) calc(var(--page-gutter) + ((100% - (var(--page-gutter) * 2) - (var(--grid-gap) * 11)) / 12) + var(--grid-gap))
+        );
     }
 
     .top-bar {
@@ -120,12 +155,14 @@
     .quad-strip {
       position: relative;
       z-index: 1;
+      grid-column: 3 / 13;
+      justify-self: center;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       grid-auto-rows: var(--tile-size);
-      width: var(--strip-width);
+      width: min(100%, var(--strip-width));
       min-height: calc(100dvh - var(--strip-top-gap));
-      margin: var(--strip-top-gap) auto 0;
+      margin-top: var(--strip-top-gap);
     }
 
     .tile {
@@ -163,8 +200,10 @@
     .story-note {
       position: relative;
       z-index: 3;
-      width: min(78vw, 720px);
-      margin: calc(48px - 100dvh - (var(--tile-size) * 2)) auto 12vh;
+      grid-column: 4 / 12;
+      justify-self: center;
+      width: min(100%, 720px);
+      margin: calc(48px - 100dvh - (var(--tile-size) * 2)) 0 12vh;
       padding: clamp(18px, 4vw, 34px);
       color: rgba(244, 239, 229, 0.9);
       font-family: "Toterstern", Georgia, "Times New Roman", serif;
@@ -182,13 +221,23 @@
     }
 
     @media (max-width: 640px) {
+      :root {
+        --page-gutter: 16px;
+        --grid-gap: 8px;
+      }
+
       body {
         background: #050505 url("img-int/damask_exact_8x8-14-dark.png?v=20260420-1") repeat top left;
         background-size: 157px 157px;
       }
 
+      .quad-strip,
       .story-note {
-        width: min(86vw, 520px);
+        grid-column: 2 / 14;
+      }
+
+      .story-note {
+        width: min(100%, 520px);
         margin-top: calc(48px - 100dvh - (var(--tile-size) * 2));
       }
     }
