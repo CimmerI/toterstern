@@ -13,7 +13,6 @@
       --strip-width: calc(var(--tile-size) * 2);
       --bar-width: calc(var(--page-width) * 0.8);
       --strip-top-gap: 5vh;
-      --border-top-offset: 48vh;
       --cursor-default: url("cursor/Click2-32.png") 0 0, auto;
       --cursor-active: url("cursor/Click-32.png") 0 0, pointer;
     }
@@ -118,18 +117,6 @@
       pointer-events: none;
     }
 
-    .tile-border-left {
-      position: absolute;
-      top: var(--border-top-offset);
-      left: calc(50% - (var(--strip-width) / 2));
-      z-index: 2;
-      display: block;
-      width: auto;
-      height: calc(100% - var(--border-top-offset));
-      max-height: none;
-      pointer-events: none;
-    }
-
     .quad-strip {
       position: relative;
       z-index: 1;
@@ -206,11 +193,6 @@
       }
     }
 
-    @media (max-width: 900px) and (pointer: coarse) {
-      .tile-border-left {
-        height: calc((100% - var(--border-top-offset)) / 4);
-      }
-    }
   </style>
 </head>
 <body>
@@ -219,7 +201,6 @@
   </div>
   <div class="phone-stage">
     <img class="top-bar" src="img-int/toter-bar4.png?v=20260420-1" alt="" aria-hidden="true">
-    <img class="tile-border-left" src="img-int/bort-l.png?v=20260420-3" alt="" aria-hidden="true">
     <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
     <article class="story-note" aria-label="Аннотация к графической новелле">
       <p>Забудьте всё, что вы знали о Золушке. Её жизнь совсем не похожа на ту милую сказку, которую передавали в народе из поколения в поколение. Золушка не так проста, чтобы дать неприглядной правде просочиться наружу.</p>
