@@ -308,6 +308,24 @@
       cursor: var(--cursor-active);
     }
 
+    .book-modal-zoom {
+      position: fixed;
+      top: 72px;
+      right: 18px;
+      z-index: 2;
+      display: none;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(244, 239, 229, 0.3);
+      border-radius: 999px;
+      background: rgba(5, 5, 5, 0.82);
+      color: var(--text);
+      font-size: 1.45rem;
+      line-height: 1;
+      cursor: var(--cursor-active);
+    }
+
     .book-modal-image {
       display: block;
       width: auto;
@@ -316,6 +334,37 @@
       margin-inline: auto;
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
       cursor: var(--cursor-active);
+    }
+
+    @media (max-width: 900px) {
+      .book-modal {
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        overscroll-behavior: contain;
+      }
+
+      .book-modal-zoom {
+        display: grid;
+      }
+
+      .book-modal-image {
+        width: auto;
+        height: 100dvh;
+        margin: auto;
+      }
+
+      .book-modal.is-zoomed {
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 64px 16px 24px;
+      }
+
+      .book-modal.is-zoomed .book-modal-image {
+        width: auto;
+        height: auto;
+        margin: 0;
+      }
     }
 
     @media (max-width: 640px) {
@@ -340,10 +389,6 @@
         margin-top: var(--story-note-top);
       }
 
-      .book-modal {
-        justify-content: flex-start;
-        padding: 64px 16px 24px;
-      }
     }
 
   </style>
@@ -364,15 +409,16 @@
       </article>
       <figure class="window-scene" aria-label="Золушка с книгой в декоративном окне">
         <button class="window-scene-button" id="book-modal-open" type="button" aria-haspopup="dialog" aria-controls="book-modal">
-          <img class="window-scene-character" src="characters/with-a-book-window-cut.png?v=20260421-1" alt="">
-          <img class="window-scene-frame" src="img-int/window01black.png?v=20260421-1" alt="">
+          <img class="window-scene-character" src="characters/with-a-book-window-cut.png?v=20260421-2" alt="">
+          <img class="window-scene-frame" src="img-int/window01black.png?v=20260421-2" alt="">
         </button>
       </figure>
     </section>
   </div>
   <div class="book-modal" id="book-modal" role="dialog" aria-modal="true" aria-label="Иллюстрация с книгой" hidden>
     <button class="book-modal-close" id="book-modal-close" type="button" aria-label="Закрыть">×</button>
-    <img class="book-modal-image" id="book-modal-image" src="characters/with-a-book.png?v=20260421-1" alt="Золушка с книгой">
+    <button class="book-modal-zoom" id="book-modal-zoom" type="button" aria-label="Открыть в полном размере" aria-pressed="false">+</button>
+    <img class="book-modal-image" id="book-modal-image" src="characters/with-a-book.png?v=20260421-2" alt="Золушка с книгой">
   </div>
   <script>
     (() => {
@@ -380,7 +426,9 @@
       const bookModal = document.getElementById("book-modal");
       const bookModalOpen = document.getElementById("book-modal-open");
       const bookModalClose = document.getElementById("book-modal-close");
+      const bookModalZoom = document.getElementById("book-modal-zoom");
       const bookModalImage = document.getElementById("book-modal-image");
+      const modalZoomMediaQuery = window.matchMedia("(max-width: 900px)");
       const columns = 2;
 
       const getVariant = (x, y) => {
@@ -425,7 +473,18 @@
         scheduleRender();
       });
 
+      const setBookModalZoom = (isZoomed) => {
+        bookModal.classList.toggle("is-zoomed", isZoomed);
+        bookModalZoom.textContent = isZoomed ? "−" : "+";
+        bookModalZoom.setAttribute("aria-pressed", String(isZoomed));
+        bookModalZoom.setAttribute(
+          "aria-label",
+          isZoomed ? "Уместить по высоте экрана" : "Открыть в полном размере"
+        );
+      };
+
       const openBookModal = () => {
+        setBookModalZoom(false);
         bookModal.hidden = false;
         document.body.style.overflow = "hidden";
         bookModalClose.focus();
@@ -433,12 +492,18 @@
 
       const closeBookModal = () => {
         bookModal.hidden = true;
+        setBookModalZoom(false);
         document.body.style.overflow = "";
         bookModalOpen.focus();
       };
 
       bookModalOpen.addEventListener("click", openBookModal);
       bookModalClose.addEventListener("click", closeBookModal);
+      bookModalZoom.addEventListener("click", () => {
+        if (modalZoomMediaQuery.matches) {
+          setBookModalZoom(!bookModal.classList.contains("is-zoomed"));
+        }
+      });
       bookModalImage.addEventListener("dblclick", closeBookModal);
 
       window.addEventListener("keydown", (event) => {
