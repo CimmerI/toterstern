@@ -13,6 +13,8 @@
       --strip-width: calc(var(--tile-size) * 2);
       --bar-width: calc(var(--page-width) * 0.8);
       --strip-top-gap: 5vh;
+      --cursor-default: url("cursor/Click2-32.png") 0 0, auto;
+      --cursor-active: url("cursor/Click-32.png") 0 0, pointer;
     }
 
     * {
@@ -32,6 +34,23 @@
       background-size: 314px 314px;
       color: var(--text);
       overflow-x: hidden;
+      cursor: var(--cursor-default);
+    }
+
+    body * {
+      cursor: var(--cursor-default);
+    }
+
+    a[href],
+    button:not(:disabled),
+    [role="button"],
+    [tabindex]:not([tabindex="-1"]) {
+      cursor: var(--cursor-active);
+    }
+
+    button:disabled,
+    [aria-disabled="true"] {
+      cursor: var(--cursor-default);
     }
 
     body::before {
