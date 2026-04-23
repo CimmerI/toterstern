@@ -231,47 +231,106 @@
       margin-top: 1em;
     }
 
-    .window-scene {
+    .card-carousel {
       position: relative;
-      z-index: 1;
-      width: var(--window-width);
-      aspect-ratio: 2278 / 3008;
-      margin: var(--window-top-gap) auto 0;
+      width: min(82vw, 420px);
+      aspect-ratio: 620 / 877;
+      margin: clamp(18px, 4vw, 36px) auto 0;
+      overflow: hidden;
     }
 
-    .window-scene-button {
-      position: relative;
+    .card-carousel-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 620ms ease;
+      will-change: transform;
+    }
+
+    .card-carousel-slide {
+      flex: 0 0 100%;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      padding: clamp(4px, 1vw, 10px);
+    }
+
+    .card-carousel-image {
       display: block;
       width: 100%;
       height: 100%;
+      object-fit: contain;
+      user-select: none;
+    }
+
+    .card-carousel-control {
+      position: absolute;
+      top: 50%;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: clamp(54px, 12vw, 86px);
+      height: auto;
+      aspect-ratio: 155 / 100;
       padding: 0;
       border: 0;
       background: transparent;
-      color: inherit;
+      transform: translateY(-50%);
       cursor: var(--cursor-active);
     }
 
-    .window-scene-button *,
-    .window-scene-button:hover {
-      cursor: var(--cursor-active);
+    .card-carousel-control:hover,
+    .card-carousel-control:focus-visible {
+      outline: none;
     }
 
-    .window-scene-character,
-    .window-scene-frame {
-      position: absolute;
-      inset: 0;
+    .card-carousel-control:focus-visible {
+      outline: 1px solid rgba(244, 239, 229, 0.62);
+      outline-offset: 2px;
+    }
+
+    .card-carousel-control.prev {
+      left: -4px;
+    }
+
+    .card-carousel-control.next {
+      right: -4px;
+    }
+
+    .card-carousel-arrow {
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      pointer-events: none;
     }
 
-    .window-scene-character {
-      z-index: 1;
-    }
-
-    .window-scene-frame {
+    .card-carousel-dots {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 10px;
       z-index: 2;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .card-carousel-dot {
+      width: 9px;
+      height: 9px;
+      padding: 0;
+      border: 1px solid rgba(244, 239, 229, 0.58);
+      border-radius: 50%;
+      background: rgba(5, 5, 5, 0.62);
+      pointer-events: auto;
+      cursor: var(--cursor-active);
+    }
+
+    .card-carousel-dot[aria-current="true"] {
+      background: var(--text);
     }
 
     .book-modal {
@@ -389,6 +448,20 @@
         margin-top: var(--story-note-top);
       }
 
+      .card-carousel {
+        width: min(92vw, 360px);
+      }
+
+      .card-carousel-control {
+        width: clamp(46px, 16vw, 68px);
+      }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-carousel-track {
+        transition: none;
+      }
     }
 
   </style>
@@ -407,11 +480,29 @@
         <p>Это не романтическая новелла, а трагедия о падении человеческой души, о цене, которую готовы платить люди ради достижения своих целей — будь то любовь, могущество или признание.</p>
         <p>Узнайте, чем для Золушки обернутся её мечты, в моём авторском комиксе.</p>
       </article>
-      <figure class="window-scene" aria-label="Золушка с книгой в декоративном окне">
-        <button class="window-scene-button" id="book-modal-open" type="button" aria-haspopup="dialog" aria-controls="book-modal">
-          <img class="window-scene-character" src="characters/with-a-book-window-cut.png?v=20260421-2" alt="">
-          <img class="window-scene-frame" src="img-int/window01black.png?v=20260421-2" alt="">
+      <figure class="card-carousel" id="card-carousel" aria-label="Карточки персонажей">
+        <div class="card-carousel-track" id="card-carousel-track">
+          <div class="card-carousel-slide">
+            <img class="card-carousel-image" src="cards/KartochkaF_sm.png" alt="Карточка персонажа">
+          </div>
+          <div class="card-carousel-slide">
+            <img class="card-carousel-image" src="cards/KartochkaSh2_sm.png" alt="Карточка персонажа">
+          </div>
+          <div class="card-carousel-slide">
+            <img class="card-carousel-image" src="cards/PrintzK_sm.png" alt="Карточка персонажа">
+          </div>
+        </div>
+        <button class="card-carousel-control prev" id="card-carousel-prev" type="button" aria-label="Предыдущая карточка">
+          <img class="card-carousel-arrow" src="img-int/s-left.png" alt="" aria-hidden="true">
         </button>
+        <button class="card-carousel-control next" id="card-carousel-next" type="button" aria-label="Следующая карточка">
+          <img class="card-carousel-arrow" src="img-int/s-right.png" alt="" aria-hidden="true">
+        </button>
+        <div class="card-carousel-dots" aria-label="Выбор карточки">
+          <button class="card-carousel-dot" type="button" aria-label="Показать карточку 1" aria-current="true" data-card-slide="0"></button>
+          <button class="card-carousel-dot" type="button" aria-label="Показать карточку 2" data-card-slide="1"></button>
+          <button class="card-carousel-dot" type="button" aria-label="Показать карточку 3" data-card-slide="2"></button>
+        </div>
       </figure>
     </section>
   </div>
@@ -424,12 +515,26 @@
     (() => {
       const strip = document.getElementById("quad-strip");
       const bookModal = document.getElementById("book-modal");
-      const bookModalOpen = document.getElementById("book-modal-open");
       const bookModalClose = document.getElementById("book-modal-close");
       const bookModalZoom = document.getElementById("book-modal-zoom");
       const bookModalImage = document.getElementById("book-modal-image");
       const modalZoomMediaQuery = window.matchMedia("(max-width: 900px)");
+      const cardCarousel = document.getElementById("card-carousel");
+      const cardCarouselTrack = document.getElementById("card-carousel-track");
+      const cardSlides = Array.from(document.querySelectorAll(".card-carousel-slide"));
+      const cardDots = Array.from(document.querySelectorAll(".card-carousel-dot"));
+      const cardCarouselPrev = document.getElementById("card-carousel-prev");
+      const cardCarouselNext = document.getElementById("card-carousel-next");
+      const cardCarouselDelay = 4200;
       const columns = 2;
+      let activeCardSlide = 0;
+      let cardTrackPosition = 0;
+      let cardCarouselTimer = 0;
+
+      const firstCardClone = cardSlides[0].cloneNode(true);
+      firstCardClone.classList.add("is-clone");
+      firstCardClone.setAttribute("aria-hidden", "true");
+      cardCarouselTrack.appendChild(firstCardClone);
 
       const getVariant = (x, y) => {
         if (x % 2 === 0 && y % 2 === 0) return "tile";
@@ -473,6 +578,102 @@
         scheduleRender();
       });
 
+      const setCardTrackPosition = (position, shouldAnimate = true) => {
+        cardCarouselTrack.style.transition = shouldAnimate ? "" : "none";
+        cardCarouselTrack.style.transform = `translateX(${-position * 100}%)`;
+        if (!shouldAnimate) {
+          cardCarouselTrack.offsetHeight;
+          cardCarouselTrack.style.transition = "";
+        }
+      };
+
+      const syncCardCarouselState = () => {
+        cardSlides.forEach((slide, slideIndex) => {
+          slide.toggleAttribute("aria-hidden", slideIndex !== activeCardSlide);
+        });
+        cardDots.forEach((dot, dotIndex) => {
+          if (dotIndex === activeCardSlide) {
+            dot.setAttribute("aria-current", "true");
+          } else {
+            dot.removeAttribute("aria-current");
+          }
+        });
+      };
+
+      const setCardSlide = (index, shouldAnimate = true) => {
+        activeCardSlide = (index + cardSlides.length) % cardSlides.length;
+        cardTrackPosition = activeCardSlide;
+        setCardTrackPosition(cardTrackPosition, shouldAnimate);
+        syncCardCarouselState();
+      };
+
+      const showNextCardSlide = () => {
+        if (activeCardSlide === cardSlides.length - 1) {
+          activeCardSlide = 0;
+          cardTrackPosition = cardSlides.length;
+          setCardTrackPosition(cardTrackPosition);
+          syncCardCarouselState();
+          return;
+        }
+
+        setCardSlide(activeCardSlide + 1);
+      };
+
+      const showPrevCardSlide = () => {
+        if (activeCardSlide === 0) {
+          cardTrackPosition = cardSlides.length;
+          setCardTrackPosition(cardTrackPosition, false);
+          setCardSlide(cardSlides.length - 1);
+          return;
+        }
+
+        setCardSlide(activeCardSlide - 1);
+      };
+
+      const startCardCarousel = () => {
+        window.clearInterval(cardCarouselTimer);
+        cardCarouselTimer = window.setInterval(() => {
+          showNextCardSlide();
+        }, cardCarouselDelay);
+      };
+
+      const restartCardCarousel = () => {
+        setCardSlide(activeCardSlide);
+        startCardCarousel();
+      };
+
+      cardCarouselPrev.addEventListener("click", () => {
+        showPrevCardSlide();
+        startCardCarousel();
+      });
+      cardCarouselNext.addEventListener("click", () => {
+        showNextCardSlide();
+        startCardCarousel();
+      });
+      cardDots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          setCardSlide(Number(dot.dataset.cardSlide));
+          startCardCarousel();
+        });
+      });
+      cardCarousel.addEventListener("pointerenter", () => window.clearInterval(cardCarouselTimer));
+      cardCarousel.addEventListener("pointerleave", startCardCarousel);
+      cardCarousel.addEventListener("focusin", () => window.clearInterval(cardCarouselTimer));
+      cardCarousel.addEventListener("focusout", startCardCarousel);
+      cardCarouselTrack.addEventListener("transitionend", () => {
+        if (cardTrackPosition === cardSlides.length && activeCardSlide === 0) {
+          cardTrackPosition = 0;
+          setCardTrackPosition(cardTrackPosition, false);
+        }
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          window.clearInterval(cardCarouselTimer);
+        } else {
+          restartCardCarousel();
+        }
+      });
+
       const setBookModalZoom = (isZoomed) => {
         bookModal.classList.toggle("is-zoomed", isZoomed);
         bookModalZoom.textContent = isZoomed ? "−" : "+";
@@ -483,21 +684,12 @@
         );
       };
 
-      const openBookModal = () => {
-        setBookModalZoom(false);
-        bookModal.hidden = false;
-        document.body.style.overflow = "hidden";
-        bookModalClose.focus();
-      };
-
       const closeBookModal = () => {
         bookModal.hidden = true;
         setBookModalZoom(false);
         document.body.style.overflow = "";
-        bookModalOpen.focus();
       };
 
-      bookModalOpen.addEventListener("click", openBookModal);
       bookModalClose.addEventListener("click", closeBookModal);
       bookModalZoom.addEventListener("click", () => {
         if (modalZoomMediaQuery.matches) {
@@ -512,6 +704,7 @@
         }
       });
 
+      restartCardCarousel();
       renderQuadTileGrid();
     })();
   </script>
