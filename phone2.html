@@ -429,6 +429,7 @@
       max-height: calc(100dvh - clamp(40px, 9vw, 112px));
       height: auto;
       margin-inline: auto;
+      object-fit: contain;
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
       cursor: var(--cursor-active);
     }
@@ -492,12 +493,16 @@
 
       .book-modal-image {
         width: auto;
-        height: 100dvh;
+        max-width: 100vw;
+        max-height: 100dvh;
+        height: auto;
         margin: auto;
       }
 
       .book-modal.is-zoomed .book-modal-image {
         width: auto;
+        max-width: none;
+        max-height: none;
         height: auto;
         margin: 0;
       }
@@ -776,6 +781,15 @@
         }
       };
 
+      const toggleBookModalFullscreen = async () => {
+        if (isBookModalFullscreen()) {
+          await exitBookModalFullscreen();
+          return;
+        }
+
+        await requestBookModalFullscreen();
+      };
+
       const exitBookModalFullscreen = async () => {
         if (!isBookModalFullscreen()) {
           return;
@@ -856,6 +870,14 @@
         }
       };
 
+      const syncBookModalFullscreenButton = () => {
+        const isFullscreen = isBookModalFullscreen();
+        bookModalFullscreen.setAttribute(
+          "aria-label",
+          isFullscreen ? "Выйти из fullscreen" : "Открыть в fullscreen"
+        );
+      };
+
       const syncBookModalNav = () => {
         const shouldShowNav = !bookModal.hidden && cardSlides.length > 1;
         bookModalPrev.classList.toggle("is-visible", shouldShowNav);
@@ -872,6 +894,7 @@
         bookModalImage.src = getFullsizeCardSrc(previewSrc);
         bookModal.scrollTo({ left: 0, top: 0 });
         setBookModalZoom(false);
+        syncBookModalFullscreenButton();
         syncBookModalNav();
       };
 
@@ -888,6 +911,7 @@
         bookModal.hidden = false;
         document.body.style.overflow = "hidden";
         syncBookModalNav();
+        syncBookModalFullscreenButton();
         if (shouldRequestFullscreen) {
           await requestBookModalFullscreen();
         }
@@ -901,6 +925,7 @@
         document.body.style.overflow = "";
         bookModal.classList.remove("is-dragging");
         bookModalImage.removeAttribute("src");
+        syncBookModalFullscreenButton();
         syncBookModalNav();
       };
 
@@ -918,7 +943,7 @@
         closeBookModal();
       });
       bookModalFullscreen.addEventListener("click", () => {
-        requestBookModalFullscreen();
+        toggleBookModalFullscreen();
       });
       bookModalZoom.addEventListener("click", () => {
         setBookModalZoom(!bookModal.classList.contains("is-zoomed"));
@@ -967,6 +992,11 @@
         modalDragActive = false;
         bookModal.classList.remove("is-dragging");
       });
+      document.addEventListener("fullscreenchange", () => {
+        if (!bookModal.hidden) {
+          syncBookModalFullscreenButton();
+        }
+      });
 
       window.addEventListener("keydown", (event) => {
         if (!bookModal.hidden) {
@@ -1011,6 +1041,7 @@
       });
 
       restartCardCarousel();
+      syncBookModalFullscreenButton();
       renderQuadTileGrid();
     })();
   </script>
