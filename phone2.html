@@ -256,12 +256,52 @@
       padding: clamp(4px, 1vw, 10px);
     }
 
+    .card-carousel-slide.is-clone {
+      pointer-events: none;
+    }
+
+    .card-carousel-card {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: var(--cursor-active);
+    }
+
     .card-carousel-image {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: contain;
       user-select: none;
+      pointer-events: none;
+    }
+
+    .card-carousel-open {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 1px solid rgba(244, 239, 229, 0.28);
+      border-radius: 999px;
+      background: rgba(5, 5, 5, 0.68);
+      cursor: var(--cursor-active);
+    }
+
+    .card-carousel-open-icon {
+      display: block;
+      width: 18px;
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
     }
 
     .card-carousel-control {
@@ -283,11 +323,6 @@
     .card-carousel-control:hover,
     .card-carousel-control:focus-visible {
       outline: none;
-    }
-
-    .card-carousel-control:focus-visible {
-      outline: 1px solid rgba(244, 239, 229, 0.62);
-      outline-offset: 2px;
     }
 
     .card-carousel-control.prev {
@@ -338,8 +373,8 @@
       inset: 0;
       z-index: 1000;
       display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
+      align-items: center;
+      justify-content: center;
       padding: clamp(20px, 5vw, 56px);
       background: rgba(0, 0, 0, 0.82);
       overflow: auto;
@@ -349,74 +384,116 @@
       display: none;
     }
 
-    .book-modal-close {
+    .book-modal-control {
       position: fixed;
-      top: 18px;
       right: 18px;
       z-index: 2;
       display: grid;
       place-items: center;
       width: 44px;
       height: 44px;
+      padding: 0;
       border: 1px solid rgba(244, 239, 229, 0.3);
       border-radius: 999px;
       background: rgba(5, 5, 5, 0.82);
       color: var(--text);
-      font-size: 1.65rem;
-      line-height: 1;
       cursor: var(--cursor-active);
     }
 
-    .book-modal-zoom {
-      position: fixed;
-      top: 72px;
-      right: 18px;
-      z-index: 2;
-      display: none;
-      place-items: center;
-      width: 44px;
-      height: 44px;
-      border: 1px solid rgba(244, 239, 229, 0.3);
-      border-radius: 999px;
-      background: rgba(5, 5, 5, 0.82);
-      color: var(--text);
-      font-size: 1.45rem;
+    .book-modal-control-icon {
+      display: block;
+      width: 18px;
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .book-modal-close {
+      top: 18px;
+      font-size: 1.65rem;
       line-height: 1;
-      cursor: var(--cursor-active);
+    }
+
+    .book-modal-fullscreen {
+      top: 72px;
+    }
+
+    .book-modal-zoom {
+      top: 126px;
     }
 
     .book-modal-image {
       display: block;
       width: auto;
-      max-width: none;
+      max-width: min(94vw, 2480px);
+      max-height: calc(100dvh - clamp(40px, 9vw, 112px));
       height: auto;
       margin-inline: auto;
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
       cursor: var(--cursor-active);
     }
 
+    .book-modal.is-zoomed {
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 64px 16px 24px;
+    }
+
+    .book-modal.is-zoomed .book-modal-image {
+      max-width: none;
+      max-height: none;
+      margin: 0;
+    }
+
+    .book-modal.is-dragging,
+    .book-modal.is-dragging * {
+      cursor: grabbing;
+    }
+
+    .book-modal-nav {
+      position: fixed;
+      top: 50%;
+      z-index: 2;
+      display: none;
+      width: clamp(54px, 8vw, 86px);
+      height: auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      transform: translateY(-50%);
+      cursor: var(--cursor-active);
+    }
+
+    .book-modal-nav.is-visible {
+      display: block;
+    }
+
+    .book-modal-nav.prev {
+      left: 12px;
+    }
+
+    .book-modal-nav.next {
+      right: 72px;
+    }
+
+    .book-modal-nav-icon {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
     @media (max-width: 900px) {
       .book-modal {
-        align-items: center;
-        justify-content: center;
         padding: 0;
         overscroll-behavior: contain;
-      }
-
-      .book-modal-zoom {
-        display: grid;
       }
 
       .book-modal-image {
         width: auto;
         height: 100dvh;
         margin: auto;
-      }
-
-      .book-modal.is-zoomed {
-        align-items: flex-start;
-        justify-content: flex-start;
-        padding: 64px 16px 24px;
       }
 
       .book-modal.is-zoomed .book-modal-image {
@@ -456,6 +533,15 @@
         width: clamp(46px, 16vw, 68px);
       }
 
+      .card-carousel-open {
+        width: 38px;
+        height: 38px;
+      }
+
+      .book-modal-nav.next {
+        right: 64px;
+      }
+
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -480,18 +566,27 @@
         <p>Это не романтическая новелла, а трагедия о падении человеческой души, о цене, которую готовы платить люди ради достижения своих целей — будь то любовь, могущество или признание.</p>
         <p>Узнайте, чем для Золушки обернутся её мечты, в моём авторском комиксе.</p>
       </article>
-      <figure class="card-carousel" id="card-carousel" aria-label="Карточки персонажей">
+      <figure class="card-carousel" id="card-carousel" aria-label="Карточки персонажей" tabindex="0">
         <div class="card-carousel-track" id="card-carousel-track">
           <div class="card-carousel-slide">
-            <img class="card-carousel-image" src="cards/KartochkaF_sm.png" alt="Карточка персонажа">
+            <button class="card-carousel-card" type="button" aria-label="Открыть карточку персонажа в полном размере">
+              <img class="card-carousel-image" src="cards/FeyaK_sm.png?v=20260423-1" alt="Карточка персонажа">
+            </button>
           </div>
           <div class="card-carousel-slide">
-            <img class="card-carousel-image" src="cards/KartochkaSh2_sm.png" alt="Карточка персонажа">
+            <button class="card-carousel-card" type="button" aria-label="Открыть карточку персонажа в полном размере">
+              <img class="card-carousel-image" src="cards/KMKarta_sm.png?v=20260423-1" alt="Карточка персонажа">
+            </button>
           </div>
           <div class="card-carousel-slide">
-            <img class="card-carousel-image" src="cards/PrintzK_sm.png" alt="Карточка персонажа">
+            <button class="card-carousel-card" type="button" aria-label="Открыть карточку персонажа в полном размере">
+              <img class="card-carousel-image" src="cards/PrintzK_sm.png?v=20260423-1" alt="Карточка персонажа">
+            </button>
           </div>
         </div>
+        <button class="card-carousel-open" id="card-carousel-open" type="button" aria-label="Открыть текущую карточку в fullscreen">
+          <img class="card-carousel-open-icon" src="img-int/fullscreen.png" alt="" aria-hidden="true">
+        </button>
         <button class="card-carousel-control prev" id="card-carousel-prev" type="button" aria-label="Предыдущая карточка">
           <img class="card-carousel-arrow" src="img-int/s-left.png" alt="" aria-hidden="true">
         </button>
@@ -507,21 +602,36 @@
     </section>
   </div>
   <div class="book-modal" id="book-modal" role="dialog" aria-modal="true" aria-label="Иллюстрация с книгой" hidden>
-    <button class="book-modal-close" id="book-modal-close" type="button" aria-label="Закрыть">×</button>
-    <button class="book-modal-zoom" id="book-modal-zoom" type="button" aria-label="Открыть в полном размере" aria-pressed="false">+</button>
-    <img class="book-modal-image" id="book-modal-image" src="characters/with-a-book.png?v=20260421-2" alt="Золушка с книгой">
+    <button class="book-modal-nav prev" id="book-modal-prev" type="button" aria-label="Предыдущая карточка">
+      <img class="book-modal-nav-icon" src="img-int/s-left.png" alt="" aria-hidden="true">
+    </button>
+    <button class="book-modal-nav next" id="book-modal-next" type="button" aria-label="Следующая карточка">
+      <img class="book-modal-nav-icon" src="img-int/s-right.png" alt="" aria-hidden="true">
+    </button>
+    <button class="book-modal-control book-modal-close" id="book-modal-close" type="button" aria-label="Закрыть">×</button>
+    <button class="book-modal-control book-modal-fullscreen" id="book-modal-fullscreen" type="button" aria-label="Открыть в fullscreen">
+      <img class="book-modal-control-icon" src="img-int/fullscreen.png" alt="" aria-hidden="true">
+    </button>
+    <button class="book-modal-control book-modal-zoom" id="book-modal-zoom" type="button" aria-label="Включить зум" aria-pressed="false">
+      <img class="book-modal-control-icon" src="img-int/lupa.png" alt="" aria-hidden="true">
+    </button>
+    <img class="book-modal-image" id="book-modal-image" src="" alt="Карточка персонажа в полном размере">
   </div>
   <script>
     (() => {
       const strip = document.getElementById("quad-strip");
       const bookModal = document.getElementById("book-modal");
+      const bookModalPrev = document.getElementById("book-modal-prev");
+      const bookModalNext = document.getElementById("book-modal-next");
       const bookModalClose = document.getElementById("book-modal-close");
+      const bookModalFullscreen = document.getElementById("book-modal-fullscreen");
       const bookModalZoom = document.getElementById("book-modal-zoom");
       const bookModalImage = document.getElementById("book-modal-image");
-      const modalZoomMediaQuery = window.matchMedia("(max-width: 900px)");
       const cardCarousel = document.getElementById("card-carousel");
       const cardCarouselTrack = document.getElementById("card-carousel-track");
       const cardSlides = Array.from(document.querySelectorAll(".card-carousel-slide"));
+      const cardOpenButtons = Array.from(document.querySelectorAll(".card-carousel-card"));
+      const cardCarouselOpen = document.getElementById("card-carousel-open");
       const cardDots = Array.from(document.querySelectorAll(".card-carousel-dot"));
       const cardCarouselPrev = document.getElementById("card-carousel-prev");
       const cardCarouselNext = document.getElementById("card-carousel-next");
@@ -530,6 +640,12 @@
       let activeCardSlide = 0;
       let cardTrackPosition = 0;
       let cardCarouselTimer = 0;
+      let activeModalCardIndex = 0;
+      let modalDragActive = false;
+      let modalDragStartX = 0;
+      let modalDragStartY = 0;
+      let modalDragStartLeft = 0;
+      let modalDragStartTop = 0;
 
       const firstCardClone = cardSlides[0].cloneNode(true);
       firstCardClone.classList.add("is-clone");
@@ -642,6 +758,47 @@
         startCardCarousel();
       };
 
+      const getFullsizeCardSrc = (previewSrc) => previewSrc.replace(/_sm(\.[^.?#]+)(\?[^#]*)?$/, "$1$2");
+      const getPreviewCardSrc = (index) =>
+        cardSlides[index]?.querySelector(".card-carousel-image")?.getAttribute("src") ?? "";
+
+      const isBookModalFullscreen = () => document.fullscreenElement === bookModal;
+
+      const requestBookModalFullscreen = async () => {
+        if (isBookModalFullscreen() || typeof bookModal.requestFullscreen !== "function") {
+          return;
+        }
+
+        try {
+          await bookModal.requestFullscreen({ navigationUI: "hide" });
+        } catch (_error) {
+          // Overlay remains open even if the browser declines fullscreen.
+        }
+      };
+
+      const exitBookModalFullscreen = async () => {
+        if (!isBookModalFullscreen()) {
+          return;
+        }
+
+        try {
+          await document.exitFullscreen();
+        } catch (_error) {
+          // Ignore browser exit failures and keep closing the overlay.
+        }
+      };
+
+      const isTypingTarget = (target) => {
+        if (!(target instanceof HTMLElement)) {
+          return false;
+        }
+
+        return (
+          target.isContentEditable ||
+          target.closest('input, textarea, select, [contenteditable="true"]')
+        );
+      };
+
       cardCarouselPrev.addEventListener("click", () => {
         showPrevCardSlide();
         startCardCarousel();
@@ -655,6 +812,19 @@
           setCardSlide(Number(dot.dataset.cardSlide));
           startCardCarousel();
         });
+      });
+      cardCarousel.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          showPrevCardSlide();
+          startCardCarousel();
+        }
+
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          showNextCardSlide();
+          startCardCarousel();
+        }
       });
       cardCarousel.addEventListener("pointerenter", () => window.clearInterval(cardCarouselTimer));
       cardCarousel.addEventListener("pointerleave", startCardCarousel);
@@ -676,29 +846,165 @@
 
       const setBookModalZoom = (isZoomed) => {
         bookModal.classList.toggle("is-zoomed", isZoomed);
-        bookModalZoom.textContent = isZoomed ? "−" : "+";
         bookModalZoom.setAttribute("aria-pressed", String(isZoomed));
         bookModalZoom.setAttribute(
           "aria-label",
-          isZoomed ? "Уместить по высоте экрана" : "Открыть в полном размере"
+          isZoomed ? "Выключить зум" : "Включить зум"
         );
+        if (!isZoomed) {
+          bookModal.scrollTo({ left: 0, top: 0 });
+        }
       };
 
-      const closeBookModal = () => {
+      const syncBookModalNav = () => {
+        const shouldShowNav = !bookModal.hidden && cardSlides.length > 1;
+        bookModalPrev.classList.toggle("is-visible", shouldShowNav);
+        bookModalNext.classList.toggle("is-visible", shouldShowNav);
+      };
+
+      const applyModalCardByIndex = (index) => {
+        activeModalCardIndex = (index + cardSlides.length) % cardSlides.length;
+        const previewSrc = getPreviewCardSrc(activeModalCardIndex);
+        if (!previewSrc) {
+          return;
+        }
+
+        bookModalImage.src = getFullsizeCardSrc(previewSrc);
+        bookModal.scrollTo({ left: 0, top: 0 });
+        setBookModalZoom(false);
+        syncBookModalNav();
+      };
+
+      const showModalPrevCard = () => {
+        applyModalCardByIndex(activeModalCardIndex - 1);
+      };
+
+      const showModalNextCard = () => {
+        applyModalCardByIndex(activeModalCardIndex + 1);
+      };
+
+      const openCardModal = async (index, shouldRequestFullscreen = true) => {
+        applyModalCardByIndex(index);
+        bookModal.hidden = false;
+        document.body.style.overflow = "hidden";
+        syncBookModalNav();
+        if (shouldRequestFullscreen) {
+          await requestBookModalFullscreen();
+        }
+        bookModalClose.focus();
+      };
+
+      const closeBookModal = async () => {
+        await exitBookModalFullscreen();
         bookModal.hidden = true;
         setBookModalZoom(false);
         document.body.style.overflow = "";
+        bookModal.classList.remove("is-dragging");
+        bookModalImage.removeAttribute("src");
+        syncBookModalNav();
       };
 
-      bookModalClose.addEventListener("click", closeBookModal);
+      cardOpenButtons.forEach((button, index) => {
+        button.addEventListener("click", () => {
+          openCardModal(index, true);
+        });
+      });
+      cardCarouselOpen.addEventListener("click", () => {
+        openCardModal(activeCardSlide, true);
+      });
+      bookModalPrev.addEventListener("click", showModalPrevCard);
+      bookModalNext.addEventListener("click", showModalNextCard);
+      bookModalClose.addEventListener("click", () => {
+        closeBookModal();
+      });
+      bookModalFullscreen.addEventListener("click", () => {
+        requestBookModalFullscreen();
+      });
       bookModalZoom.addEventListener("click", () => {
-        if (modalZoomMediaQuery.matches) {
-          setBookModalZoom(!bookModal.classList.contains("is-zoomed"));
+        setBookModalZoom(!bookModal.classList.contains("is-zoomed"));
+      });
+      bookModal.addEventListener(
+        "wheel",
+        (event) => {
+          if (bookModal.hidden || !bookModal.classList.contains("is-zoomed")) {
+            return;
+          }
+
+          event.preventDefault();
+          bookModal.scrollLeft += event.deltaX;
+          bookModal.scrollTop += event.deltaY;
+        },
+        { passive: false }
+      );
+      bookModal.addEventListener("mousedown", (event) => {
+        if (bookModal.hidden || !bookModal.classList.contains("is-zoomed") || event.button !== 1) {
+          return;
+        }
+
+        event.preventDefault();
+        modalDragActive = true;
+        modalDragStartX = event.clientX;
+        modalDragStartY = event.clientY;
+        modalDragStartLeft = bookModal.scrollLeft;
+        modalDragStartTop = bookModal.scrollTop;
+        bookModal.classList.add("is-dragging");
+      });
+      bookModal.addEventListener("auxclick", (event) => {
+        if (!bookModal.hidden && bookModal.classList.contains("is-zoomed") && event.button === 1) {
+          event.preventDefault();
         }
       });
-      bookModalImage.addEventListener("dblclick", closeBookModal);
+      window.addEventListener("mousemove", (event) => {
+        if (!modalDragActive) {
+          return;
+        }
+
+        event.preventDefault();
+        bookModal.scrollLeft = modalDragStartLeft - (event.clientX - modalDragStartX);
+        bookModal.scrollTop = modalDragStartTop - (event.clientY - modalDragStartY);
+      });
+      window.addEventListener("mouseup", () => {
+        modalDragActive = false;
+        bookModal.classList.remove("is-dragging");
+      });
 
       window.addEventListener("keydown", (event) => {
+        if (!bookModal.hidden) {
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            showModalPrevCard();
+            return;
+          }
+
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            showModalNextCard();
+            return;
+          }
+        }
+
+        if (
+          bookModal.hidden &&
+          !event.altKey &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !isTypingTarget(event.target)
+        ) {
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            showPrevCardSlide();
+            startCardCarousel();
+            return;
+          }
+
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            showNextCardSlide();
+            startCardCarousel();
+            return;
+          }
+        }
+
         if (event.key === "Escape" && !bookModal.hidden) {
           closeBookModal();
         }
