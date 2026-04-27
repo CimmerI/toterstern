@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toterstern — Zolushka comic reader</title>
+  <meta name="description" content="В графической новелле «Золушка. Кровавый восход» нет однозначно положительных героев: у каждого персонажа свои слабости, тайные мотивы и тёмные стороны. Золушка умна, амбициозна и готова идти до конца, но к чему это её приведёт?">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#050505">
+  <link rel="canonical" href="https://toterstern.com/zolushka.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+  <link rel="manifest" href="assets/favicon/site.webmanifest">
+  <meta property="og:site_name" content="Toterstern">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Toterstern — Zolushka comic reader">
+  <meta property="og:description" content="В графической новелле «Золушка. Кровавый восход» нет однозначно положительных героев: у каждого персонажа свои слабости, тайные мотивы и тёмные стороны. Золушка умна, амбициозна и готова идти до конца, но к чему это её приведёт?">
+  <meta property="og:url" content="https://toterstern.com/zolushka.html">
+  <meta property="og:image" content="https://toterstern.com/assets/favicon/icon-512.png">
+  <meta property="og:image:alt" content="Toterstern icon">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Toterstern — Zolushka comic reader">
+  <meta name="twitter:description" content="В графической новелле «Золушка. Кровавый восход» нет однозначно положительных героев: у каждого персонажа свои слабости, тайные мотивы и тёмные стороны. Золушка умна, амбициозна и готова идти до конца, но к чему это её приведёт?">
+  <meta name="twitter:image" content="https://toterstern.com/assets/favicon/icon-512.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=20260421-4">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Toterstern",
+      "url": "https://toterstern.com/",
+      "description": "В графической новелле «Золушка. Кровавый восход» нет однозначно положительных героев: у каждого персонажа свои слабости, тайные мотивы и тёмные стороны. Золушка умна, амбициозна и готова идти до конца, но к чему это её приведёт?",
+      "inLanguage": "ru",
+      "image": "https://toterstern.com/assets/favicon/icon-512.png"
+    }
+  </script>
+</head>
+<body>
+  <div class="site-preloader" id="site-preloader" aria-label="Loading">
+    <img class="site-preloader-video" src="img-int/burbon.png?v=20260419-2" alt="" aria-hidden="true">
+  </div>
+  <div class="page-shell">
+    <header class="site-header">
+      <div>
+        <a class="site-mark" href="index.html">Toterstern</a>
+        <p class="site-subtitle">Zolushka</p>
+      </div>
+      <div class="page-status" aria-live="polite">
+        <span id="spread-label">Page 1</span>
+      </div>
+    </header>
+
+    <main class="reader" id="top">
+      <button class="nav-button nav-button-left" id="prev-button" type="button" aria-label="Previous spread">
+        <img class="control-icon" src="img-int/s-left.png" alt="" aria-hidden="true">
+      </button>
+
+      <section class="book-stage" aria-label="Comic viewer">
+        <div class="book-glow"></div>
+        <button class="fullscreen-toggle" id="fullscreen-toggle" type="button" aria-label="Open fullscreen">
+          <img class="control-icon fullscreen-toggle-open" src="img-int/fullscreen.png" alt="" aria-hidden="true">
+          <span class="fullscreen-toggle-close" aria-hidden="true">×</span>
+        </button>
+        <button class="zoom-edge-action zoom-edge-action-top" id="zoom-prev-edge" type="button">
+          <img class="zoom-edge-icon" src="img-int/lupa.png" alt="" aria-hidden="true">
+          <img class="zoom-edge-icon zoom-edge-arrow" src="img-int/s-left.png" alt="" aria-hidden="true">
+          <span>назад</span>
+        </button>
+        <button class="zoom-edge-action zoom-edge-action-bottom" id="zoom-next-edge" type="button">
+          <img class="zoom-edge-icon" src="img-int/lupa.png" alt="" aria-hidden="true">
+          <img class="zoom-edge-icon zoom-edge-arrow" src="img-int/s-right.png" alt="" aria-hidden="true">
+          <span>вперёд</span>
+        </button>
+        <div class="tap-zone tap-zone-left" id="tap-left" aria-hidden="true"></div>
+        <div class="tap-zone tap-zone-right" id="tap-right" aria-hidden="true"></div>
+        <div class="spread" id="spread"></div>
+      </section>
+
+      <button class="nav-button nav-button-right" id="next-button" type="button" aria-label="Next spread">
+        <img class="control-icon" src="img-int/s-right.png" alt="" aria-hidden="true">
+      </button>
+    </main>
+
+    <footer class="reader-hint">
+      <span>Left / Right</span>
+      <span>Up to the beginning</span>
+      <span>Down to the end</span>
+    </footer>
+  </div>
+
+  <script src="assets/js/app.js?v=20260419-4"></script>
+</body>
+</html>
