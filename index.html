@@ -810,14 +810,10 @@
       const cardCarouselPrev = document.getElementById("card-carousel-prev");
       const cardCarouselNext = document.getElementById("card-carousel-next");
       const cardCarouselDelay = 4200;
-      const cardScrollStep = 180;
       const columns = 2;
       let activeCardSlide = 0;
       let cardTrackPosition = 0;
       let cardCarouselTimer = 0;
-      let lastScrollY = window.scrollY;
-      let cardScrollAccumulator = 0;
-      let cardScrollIdleTimer = 0;
       let activeModalCardIndex = 0;
       let modalDragActive = false;
       let modalDragStartX = 0;
@@ -881,10 +877,7 @@
         });
       };
 
-      window.addEventListener("scroll", () => {
-        updateCoverRotation();
-        syncCardCarouselWithScroll();
-      }, { passive: true });
+      window.addEventListener("scroll", updateCoverRotation, { passive: true });
       window.addEventListener("resize", scheduleRender, { passive: true });
       window.addEventListener("load", () => {
         document.getElementById("site-preloader")?.classList.add("is-hidden");
@@ -953,36 +946,6 @@
       const restartCardCarousel = () => {
         setCardSlide(activeCardSlide);
         startCardCarousel();
-      };
-
-      const syncCardCarouselWithScroll = () => {
-        const currentScrollY = window.scrollY;
-        const scrollDelta = currentScrollY - lastScrollY;
-
-        lastScrollY = currentScrollY;
-
-        if (scrollDelta === 0) {
-          return;
-        }
-
-        window.clearInterval(cardCarouselTimer);
-        window.clearTimeout(cardScrollIdleTimer);
-        cardScrollAccumulator += scrollDelta;
-
-        while (cardScrollAccumulator >= cardScrollStep) {
-          showNextCardSlide();
-          cardScrollAccumulator -= cardScrollStep;
-        }
-
-        while (cardScrollAccumulator <= -cardScrollStep) {
-          showPrevCardSlide();
-          cardScrollAccumulator += cardScrollStep;
-        }
-
-        cardScrollIdleTimer = window.setTimeout(() => {
-          cardScrollAccumulator = 0;
-          startCardCarousel();
-        }, 180);
       };
 
       const getFullsizeCardSrc = (previewSrc) => previewSrc.replace(/_sm(\.[^.?#]+)(\?[^#]*)?$/, "$1$2");
