@@ -61,6 +61,20 @@ button:not(:disabled),
   cursor: var(--cursor-active);
 }
 
+a,
+a:link,
+a:visited,
+a:hover,
+a:active,
+a:focus,
+a:focus-visible {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  box-shadow: none;
+}
+
 .tap-zone {
   cursor: var(--cursor-active);
 }
