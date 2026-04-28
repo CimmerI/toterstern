@@ -749,7 +749,7 @@
             <img
               class="cover-reveal-image"
               id="cover-reveal-image"
-              src="comics/Oblozhka_sm.png?v=20260428-1"
+              src="comics/Book_sm.png?v=20260428-1"
               alt="Обложка графической новеллы «Золушка. Кровавый восход»"
             >
           </a>
@@ -966,11 +966,8 @@
         const rect = coverRevealImage.getBoundingClientRect();
         const viewportCenter = window.innerHeight / 2;
         const imageCenter = rect.top + (rect.height / 2);
-        const normalizedOffset = Math.min(
-          1,
-          Math.max(-1, (viewportCenter - imageCenter) / viewportCenter)
-        );
-        const rotation = normalizedOffset * 30;
+        const normalizedOffset = Math.max(0, Math.min(1, (imageCenter - viewportCenter) / viewportCenter));
+        const rotation = normalizedOffset * -30;
 
         coverRevealImage.style.setProperty("--cover-rotation", `${rotation}deg`);
       }
