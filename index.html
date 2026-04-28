@@ -336,7 +336,7 @@
 
     .embed-code {
       position: relative;
-      width: min(100%, 720px);
+      width: min(75%, 540px);
       margin: 14px auto 0;
       padding: 18px 18px 16px;
       border: 1px solid rgba(244, 239, 229, 0.14);
@@ -355,13 +355,25 @@
 
     .embed-code pre {
       margin: 0;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
+      max-height: calc(1.55em * 3);
+      overflow: auto;
+      white-space: pre;
       color: rgba(244, 239, 229, 0.92);
       font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
       font-size: 0.83rem;
       line-height: 1.55;
+    }
+
+    .embed-token-tag {
+      color: #ff8f88;
+    }
+
+    .embed-token-attr {
+      color: #9ad1ff;
+    }
+
+    .embed-token-string {
+      color: #bfdc8d;
     }
 
     .copy-code-button {
@@ -757,6 +769,7 @@
       }
 
       .embed-code {
+        width: min(75%, 405px);
         padding: 14px 14px 12px;
       }
 
@@ -765,6 +778,7 @@
       }
 
       .embed-code pre {
+        max-height: calc(1.45em * 3);
         font-size: 0.72rem;
         line-height: 1.45;
       }
@@ -885,13 +899,13 @@
           </svg>
         </button>
         <p class="embed-code-label">Код для вставки баннера на другой сайт</p>
-        <pre><code id="embed-code-vstavka">&lt;a href="https://toterstern.com/zolushka.html" target="_blank" rel="noopener noreferrer" title="Toterstern — Zolushka comic reader"&gt;
-  &lt;img
-    src="https://toterstern.com/comics/Vstavka_tr.png"
-    alt="Золушка. Кровавый восход — авторская графическая новелла Toterstern"
-    style="display:block;max-width:100%;height:auto;border:0"
-  &gt;
-&lt;/a&gt;</code></pre>
+        <pre><code id="embed-code-vstavka"><span class="embed-token-tag">&lt;a</span> <span class="embed-token-attr">href</span>=<span class="embed-token-string">"https://toterstern.com/zolushka.html"</span> <span class="embed-token-attr">target</span>=<span class="embed-token-string">"_blank"</span> <span class="embed-token-attr">rel</span>=<span class="embed-token-string">"noopener noreferrer"</span> <span class="embed-token-attr">title</span>=<span class="embed-token-string">"Toterstern — Zolushka comic reader"</span><span class="embed-token-tag">&gt;</span>
+  <span class="embed-token-tag">&lt;img</span>
+    <span class="embed-token-attr">src</span>=<span class="embed-token-string">"https://toterstern.com/comics/Vstavka_tr.png"</span>
+    <span class="embed-token-attr">alt</span>=<span class="embed-token-string">"Золушка. Кровавый восход — авторская графическая новелла Toterstern"</span>
+    <span class="embed-token-attr">style</span>=<span class="embed-token-string">"display:block;width:180px;max-width:100%;height:auto;border:0"</span>
+  <span class="embed-token-tag">&gt;</span>
+<span class="embed-token-tag">&lt;/a&gt;</span></code></pre>
       </div>
       <div class="feature-insert">
         <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса через вставку">
@@ -909,13 +923,13 @@
           </svg>
         </button>
         <p class="embed-code-label">Код для вставки мини-баннера на другой сайт</p>
-        <pre><code id="embed-code-vstavka2">&lt;a href="https://toterstern.com/zolushka.html" target="_blank" rel="noopener noreferrer" title="Toterstern — Zolushka comic reader"&gt;
-  &lt;img
-    src="https://toterstern.com/comics/Vstavka2_tr.png"
-    alt="Графическая новелла «Золушка. Кровавый восход» — читать на Toterstern"
-    style="display:block;max-width:100%;height:auto;border:0"
-  &gt;
-&lt;/a&gt;</code></pre>
+        <pre><code id="embed-code-vstavka2"><span class="embed-token-tag">&lt;a</span> <span class="embed-token-attr">href</span>=<span class="embed-token-string">"https://toterstern.com/zolushka.html"</span> <span class="embed-token-attr">target</span>=<span class="embed-token-string">"_blank"</span> <span class="embed-token-attr">rel</span>=<span class="embed-token-string">"noopener noreferrer"</span> <span class="embed-token-attr">title</span>=<span class="embed-token-string">"Toterstern — Zolushka comic reader"</span><span class="embed-token-tag">&gt;</span>
+  <span class="embed-token-tag">&lt;img</span>
+    <span class="embed-token-attr">src</span>=<span class="embed-token-string">"https://toterstern.com/comics/Vstavka2_tr.png"</span>
+    <span class="embed-token-attr">alt</span>=<span class="embed-token-string">"Графическая новелла «Золушка. Кровавый восход» — читать на Toterstern"</span>
+    <span class="embed-token-attr">style</span>=<span class="embed-token-string">"display:block;width:140px;max-width:100%;height:auto;border:0"</span>
+  <span class="embed-token-tag">&gt;</span>
+<span class="embed-token-tag">&lt;/a&gt;</span></code></pre>
       </div>
     </section>
   </div>
