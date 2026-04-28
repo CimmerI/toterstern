@@ -280,7 +280,7 @@
       grid-row: 1;
       justify-self: center;
       width: min(100%, 720px);
-      margin: var(--story-note-top) 0 12vh;
+      margin: var(--story-note-top) 0 0;
     }
 
     .story-note {
@@ -437,13 +437,38 @@
 
     .year-mark {
       margin: clamp(36px, 7vw, 72px) auto 0;
-      padding-bottom: min(12vh, 100px);
       text-align: center;
       color: rgba(244, 239, 229, 0.72);
       font-family: "Toterstern", Georgia, "Times New Roman", serif;
       font-size: clamp(1rem, 2.8vw, 1.3rem);
       letter-spacing: 0.24em;
       text-transform: uppercase;
+    }
+
+    .back-to-top {
+      display: flex;
+      justify-content: flex-end;
+      margin: 18px auto 0;
+      padding-bottom: 0;
+    }
+
+    .back-to-top-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(244, 239, 229, 0.86);
+      font-family: "Toterstern", Georgia, "Times New Roman", serif;
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      letter-spacing: 0.08em;
+      cursor: var(--cursor-active);
+    }
+
+    .back-to-top-icon {
+      display: block;
+      width: clamp(26px, 4vw, 34px);
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
     }
 
     .copy-code-button {
@@ -885,7 +910,7 @@
   <div class="site-preloader" id="site-preloader" aria-label="Loading">
     <img class="site-preloader-video" src="img-int/preloader-dog.gif?v=20260420-1" alt="" aria-hidden="true">
   </div>
-  <div class="phone-stage">
+  <div class="phone-stage" id="top">
     <img class="top-bar" src="img-int/toter-bar4.png?v=20260420-1" alt="" aria-hidden="true">
     <main class="quad-strip" id="quad-strip" aria-hidden="true"></main>
     <section class="story-stack">
@@ -1007,6 +1032,12 @@
         </div>
       </details>
       <div class="year-mark" aria-label="Год выпуска">MMXXVI</div>
+      <div class="back-to-top">
+        <a class="back-to-top-link" href="#top" aria-label="Вернуться наверх страницы">
+          <span>Наверх</span>
+          <img class="back-to-top-icon" src="img-int/s-top.png" alt="" aria-hidden="true">
+        </a>
+      </div>
     </section>
   </div>
   <div class="book-modal" id="book-modal" role="dialog" aria-modal="true" aria-label="Иллюстрация с книгой" hidden>
@@ -1089,7 +1120,7 @@
           document.documentElement.scrollHeight,
           document.body.scrollHeight
         );
-        const rows = Math.ceil(pageHeight / tileSize) + 1;
+        const rows = Math.ceil(pageHeight / tileSize);
 
         strip.replaceChildren();
 
