@@ -376,6 +376,17 @@
       color: #bfdc8d;
     }
 
+    .year-mark {
+      margin: clamp(36px, 7vw, 72px) auto 0;
+      padding-bottom: min(12vh, 100px);
+      text-align: center;
+      color: rgba(244, 239, 229, 0.72);
+      font-family: "Toterstern", Georgia, "Times New Roman", serif;
+      font-size: clamp(1rem, 2.8vw, 1.3rem);
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
     .copy-code-button {
       position: absolute;
       top: 12px;
@@ -931,6 +942,7 @@
   <span class="embed-token-tag">&gt;</span>
 <span class="embed-token-tag">&lt;/a&gt;</span></code></pre>
       </div>
+      <div class="year-mark" aria-label="Год выпуска">MMXXVI</div>
     </section>
   </div>
   <div class="book-modal" id="book-modal" role="dialog" aria-modal="true" aria-label="Иллюстрация с книгой" hidden>
