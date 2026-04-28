@@ -1059,6 +1059,8 @@
   <script>
     (() => {
       const strip = document.getElementById("quad-strip");
+      const phoneStage = document.querySelector(".phone-stage");
+      const storyStack = document.querySelector(".story-stack");
       const bookModal = document.getElementById("book-modal");
       const bookModalPrev = document.getElementById("book-modal-prev");
       const bookModalNext = document.getElementById("book-modal-next");
@@ -1075,6 +1077,7 @@
       const cardCarouselZoom = document.getElementById("card-carousel-zoom");
       const cardDots = Array.from(document.querySelectorAll(".card-carousel-dot"));
       const copyCodeButtons = Array.from(document.querySelectorAll(".copy-code-button"));
+      const bannerSpoiler = document.querySelector(".banner-spoiler");
       const cardCarouselPrev = document.getElementById("card-carousel-prev");
       const cardCarouselNext = document.getElementById("card-carousel-next");
       const cardCarouselDelay = 4200;
@@ -1115,11 +1118,18 @@
 
       const renderQuadTileGrid = () => {
         const tileSize = strip.clientWidth / columns;
-        const pageHeight = Math.max(
-          window.innerHeight,
-          document.documentElement.scrollHeight,
-          document.body.scrollHeight
-        );
+        const lastStoryElement = storyStack?.lastElementChild;
+        const contentBottom = lastStoryElement
+          ? lastStoryElement.getBoundingClientRect().bottom + window.scrollY
+          : phoneStage
+            ? Array.from(phoneStage.children)
+                .filter((element) => element !== strip)
+                .reduce((maxBottom, element) => {
+                  const rect = element.getBoundingClientRect();
+                  return Math.max(maxBottom, rect.bottom + window.scrollY);
+                }, 0)
+            : 0;
+        const pageHeight = Math.max(window.innerHeight, contentBottom);
         const rows = Math.ceil(pageHeight / tileSize);
 
         strip.replaceChildren();
@@ -1134,9 +1144,23 @@
             strip.appendChild(cell);
           }
         }
+
+        if (bannerSpoiler?.open) {
+          for (let x = 0; x < columns; x += 1) {
+            const cell = document.createElement("div");
+            cell.className = getVariant(x, rows);
+            cell.style.position = "absolute";
+            cell.style.top = `${rows * tileSize}px`;
+            cell.style.left = `${x * tileSize}px`;
+            cell.style.width = `${tileSize}px`;
+            cell.style.height = `${tileSize}px`;
+            strip.appendChild(cell);
+          }
+        }
       };
 
       let resizeFrame = 0;
+      let spoilerRenderTimer = 0;
       const scheduleRender = () => {
         cancelAnimationFrame(resizeFrame);
         resizeFrame = requestAnimationFrame(() => {
@@ -1147,6 +1171,16 @@
 
       window.addEventListener("scroll", updateCoverRotation, { passive: true });
       window.addEventListener("resize", scheduleRender, { passive: true });
+      bannerSpoiler?.addEventListener("toggle", () => {
+        scheduleRender();
+        requestAnimationFrame(() => {
+          scheduleRender();
+        });
+        window.clearTimeout(spoilerRenderTimer);
+        spoilerRenderTimer = window.setTimeout(() => {
+          scheduleRender();
+        }, 80);
+      });
       window.addEventListener("load", () => {
         document.getElementById("site-preloader")?.classList.add("is-hidden");
         scheduleRender();
