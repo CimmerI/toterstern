@@ -308,6 +308,62 @@
       padding-bottom: min(18vh, 160px);
     }
 
+    .banner-spoiler {
+      width: min(100%, 760px);
+      margin: clamp(24px, 6vw, 48px) auto 0;
+      border: 1px solid rgba(244, 239, 229, 0.18);
+      border-radius: 32px;
+      background:
+        linear-gradient(rgba(5, 5, 5, 0.46), rgba(5, 5, 5, 0.46)),
+        url("img-int/damask_exact_8x8-14.png?v=20260420-1") repeat top left;
+      background-size: auto, 314px 314px;
+      box-shadow:
+        -18px -18px 38px rgba(255, 244, 214, 0.05),
+        18px 22px 42px rgba(0, 0, 0, 0.42),
+        inset 1px 1px 0 rgba(255, 245, 225, 0.12),
+        inset -1px -1px 0 rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+    }
+
+    .banner-spoiler summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 20px;
+      color: rgba(244, 239, 229, 0.92);
+      background: rgba(255, 255, 255, 0.03);
+      font-family: "Toterstern", Georgia, "Times New Roman", serif;
+      font-size: clamp(1rem, 2.4vw, 1.18rem);
+      letter-spacing: 0.04em;
+      cursor: var(--cursor-active);
+      user-select: none;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 244, 220, 0.09),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.26);
+    }
+
+    .banner-spoiler summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .banner-spoiler summary::before {
+      content: "+";
+      font-size: 1rem;
+      line-height: 1;
+      transition: transform 180ms ease;
+    }
+
+    .banner-spoiler[open] summary::before {
+      transform: rotate(45deg);
+    }
+
+    .banner-spoiler-body {
+      background: transparent;
+      padding: 4px 0 22px;
+    }
+
     .feature-insert {
       display: flex;
       justify-content: center;
@@ -341,7 +397,10 @@
       padding: 18px 18px 16px;
       border: 1px solid rgba(244, 239, 229, 0.14);
       border-radius: 18px;
-      background: rgba(11, 11, 11, 0.82);
+      background:
+        linear-gradient(rgba(11, 11, 11, 0.72), rgba(11, 11, 11, 0.72)),
+        url("img-int/damask_exact_8x8-14-dark.png?v=20260420-1") repeat top left;
+      background-size: auto, 314px 314px;
       box-shadow: 0 18px 48px rgba(0, 0, 0, 0.26);
     }
 
@@ -894,54 +953,59 @@
           >
         </a>
       </div>
-      <div class="feature-button">
-        <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса по кнопке">
-          <img
-            class="feature-button-image"
-            src="comics/Vstavka_tr.png?v=20260428-1"
-            alt="Кнопка перехода на страницу графической новеллы"
-          >
-        </a>
-      </div>
-      <div class="embed-code">
-        <button class="copy-code-button" type="button" aria-label="Скопировать код баннера" data-copy-target="embed-code-vstavka" data-tooltip="скопировать код">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 3h9a2 2 0 0 1 2 2v9h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v10h9V9H5Z"/>
-          </svg>
-        </button>
-        <p class="embed-code-label">Код для вставки баннера на другой сайт</p>
-        <pre><code id="embed-code-vstavka"><span class="embed-token-tag">&lt;a</span> <span class="embed-token-attr">href</span>=<span class="embed-token-string">"https://toterstern.com/zolushka.html"</span> <span class="embed-token-attr">target</span>=<span class="embed-token-string">"_blank"</span> <span class="embed-token-attr">rel</span>=<span class="embed-token-string">"noopener noreferrer"</span> <span class="embed-token-attr">title</span>=<span class="embed-token-string">"Toterstern — Zolushka comic reader"</span><span class="embed-token-tag">&gt;</span>
+      <details class="banner-spoiler">
+        <summary>Забрать баннер</summary>
+        <div class="banner-spoiler-body">
+          <div class="feature-button">
+            <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса по кнопке">
+              <img
+                class="feature-button-image"
+                src="comics/Vstavka_tr.png?v=20260428-1"
+                alt="Кнопка перехода на страницу графической новеллы"
+              >
+            </a>
+          </div>
+          <div class="embed-code">
+            <button class="copy-code-button" type="button" aria-label="Скопировать код баннера" data-copy-target="embed-code-vstavka" data-tooltip="скопировать код">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 3h9a2 2 0 0 1 2 2v9h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v10h9V9H5Z"/>
+              </svg>
+            </button>
+            <p class="embed-code-label">Код для вставки баннера на другой сайт</p>
+            <pre><code id="embed-code-vstavka"><span class="embed-token-tag">&lt;a</span> <span class="embed-token-attr">href</span>=<span class="embed-token-string">"https://toterstern.com/zolushka.html"</span> <span class="embed-token-attr">target</span>=<span class="embed-token-string">"_blank"</span> <span class="embed-token-attr">rel</span>=<span class="embed-token-string">"noopener noreferrer"</span> <span class="embed-token-attr">title</span>=<span class="embed-token-string">"Toterstern — Zolushka comic reader"</span><span class="embed-token-tag">&gt;</span>
   <span class="embed-token-tag">&lt;img</span>
     <span class="embed-token-attr">src</span>=<span class="embed-token-string">"https://toterstern.com/comics/Vstavka_tr.png"</span>
     <span class="embed-token-attr">alt</span>=<span class="embed-token-string">"Золушка. Кровавый восход — авторская графическая новелла Toterstern"</span>
     <span class="embed-token-attr">style</span>=<span class="embed-token-string">"display:block;width:180px;max-width:100%;height:auto;border:0"</span>
   <span class="embed-token-tag">&gt;</span>
 <span class="embed-token-tag">&lt;/a&gt;</span></code></pre>
-      </div>
-      <div class="feature-insert">
-        <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса через вставку">
-          <img
-            class="feature-insert-image"
-            src="comics/Vstavka2_tr.png?v=20260428-1"
-            alt="Дополнительная вставка графической новеллы"
-          >
-        </a>
-      </div>
-      <div class="embed-code">
-        <button class="copy-code-button" type="button" aria-label="Скопировать код вставки" data-copy-target="embed-code-vstavka2" data-tooltip="скопировать код">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 3h9a2 2 0 0 1 2 2v9h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v10h9V9H5Z"/>
-          </svg>
-        </button>
-        <p class="embed-code-label">Код для вставки мини-баннера на другой сайт</p>
-        <pre><code id="embed-code-vstavka2"><span class="embed-token-tag">&lt;a</span> <span class="embed-token-attr">href</span>=<span class="embed-token-string">"https://toterstern.com/zolushka.html"</span> <span class="embed-token-attr">target</span>=<span class="embed-token-string">"_blank"</span> <span class="embed-token-attr">rel</span>=<span class="embed-token-string">"noopener noreferrer"</span> <span class="embed-token-attr">title</span>=<span class="embed-token-string">"Toterstern — Zolushka comic reader"</span><span class="embed-token-tag">&gt;</span>
+          </div>
+          <div class="feature-insert">
+            <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса через вставку">
+              <img
+                class="feature-insert-image"
+                src="comics/Vstavka2_tr.png?v=20260428-1"
+                alt="Дополнительная вставка графической новеллы"
+              >
+            </a>
+          </div>
+          <div class="embed-code">
+            <button class="copy-code-button" type="button" aria-label="Скопировать код вставки" data-copy-target="embed-code-vstavka2" data-tooltip="скопировать код">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 3h9a2 2 0 0 1 2 2v9h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v10h9V9H5Z"/>
+              </svg>
+            </button>
+            <p class="embed-code-label">Код для вставки мини-баннера на другой сайт</p>
+            <pre><code id="embed-code-vstavka2"><span class="embed-token-tag">&lt;a</span> <span class="embed-token-attr">href</span>=<span class="embed-token-string">"https://toterstern.com/zolushka.html"</span> <span class="embed-token-attr">target</span>=<span class="embed-token-string">"_blank"</span> <span class="embed-token-attr">rel</span>=<span class="embed-token-string">"noopener noreferrer"</span> <span class="embed-token-attr">title</span>=<span class="embed-token-string">"Toterstern — Zolushka comic reader"</span><span class="embed-token-tag">&gt;</span>
   <span class="embed-token-tag">&lt;img</span>
     <span class="embed-token-attr">src</span>=<span class="embed-token-string">"https://toterstern.com/comics/Vstavka2_tr.png"</span>
     <span class="embed-token-attr">alt</span>=<span class="embed-token-string">"Графическая новелла «Золушка. Кровавый восход» — читать на Toterstern"</span>
     <span class="embed-token-attr">style</span>=<span class="embed-token-string">"display:block;width:140px;max-width:100%;height:auto;border:0"</span>
   <span class="embed-token-tag">&gt;</span>
 <span class="embed-token-tag">&lt;/a&gt;</span></code></pre>
-      </div>
+          </div>
+        </div>
+      </details>
       <div class="year-mark" aria-label="Год выпуска">MMXXVI</div>
     </section>
   </div>
