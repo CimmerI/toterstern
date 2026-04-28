@@ -202,6 +202,31 @@
       pointer-events: none;
     }
 
+    .social-link {
+      position: fixed;
+      top: clamp(14px, 3vw, 28px);
+      right: clamp(14px, 3vw, 28px);
+      z-index: 12;
+      display: grid;
+      place-items: center;
+      width: clamp(38px, 5vw, 48px);
+      height: clamp(38px, 5vw, 48px);
+      color: rgba(244, 239, 229, 0.92);
+      background: rgba(5, 5, 5, 0.42);
+      border: 1px solid rgba(244, 239, 229, 0.18);
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+      cursor: var(--cursor-active);
+    }
+
+    .social-link svg {
+      display: block;
+      width: 58%;
+      height: 58%;
+      fill: currentColor;
+      pointer-events: none;
+    }
+
     .quad-strip {
       position: relative;
       z-index: 1;
@@ -283,11 +308,6 @@
       padding-bottom: min(18vh, 160px);
     }
 
-    .cover-reveal-stack {
-      position: relative;
-      display: inline-block;
-    }
-
     .feature-insert {
       display: flex;
       justify-content: center;
@@ -302,14 +322,94 @@
     }
 
     .feature-button-image {
-      position: absolute;
-      right: clamp(-10px, -1vw, -4px);
-      bottom: clamp(18px, 4vw, 32px);
-      z-index: 2;
       display: block;
       width: min(38vw, 180px);
       height: auto;
       filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.32));
+    }
+
+    .feature-button {
+      display: flex;
+      justify-content: center;
+      margin: clamp(22px, 5vw, 54px) auto 0;
+    }
+
+    .embed-code {
+      position: relative;
+      width: min(100%, 720px);
+      margin: 14px auto 0;
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(244, 239, 229, 0.14);
+      border-radius: 18px;
+      background: rgba(11, 11, 11, 0.82);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.26);
+    }
+
+    .embed-code-label {
+      margin: 0 40px 10px 0;
+      color: rgba(244, 239, 229, 0.78);
+      font-family: "Toterstern", Georgia, "Times New Roman", serif;
+      font-size: 0.98rem;
+      line-height: 1.35;
+    }
+
+    .embed-code pre {
+      margin: 0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: rgba(244, 239, 229, 0.92);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.83rem;
+      line-height: 1.55;
+    }
+
+    .copy-code-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid rgba(244, 239, 229, 0.18);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(244, 239, 229, 0.9);
+      cursor: var(--cursor-active);
+    }
+
+    .copy-code-button::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: rgba(5, 5, 5, 0.94);
+      color: rgba(244, 239, 229, 0.92);
+      font-family: "Toterstern", Georgia, "Times New Roman", serif;
+      font-size: 0.82rem;
+      line-height: 1;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .copy-code-button:hover::after,
+    .copy-code-button:focus-visible::after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .copy-code-button svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      pointer-events: none;
     }
 
     .cover-reveal-link {
@@ -653,9 +753,20 @@
       }
 
       .feature-button-image {
-        right: clamp(-6px, -0.8vw, -2px);
-        bottom: clamp(14px, 3vw, 24px);
         width: min(30.4vw, 144px);
+      }
+
+      .embed-code {
+        padding: 14px 14px 12px;
+      }
+
+      .embed-code-label {
+        font-size: 0.88rem;
+      }
+
+      .embed-code pre {
+        font-size: 0.72rem;
+        line-height: 1.45;
       }
 
       .card-carousel-control {
@@ -682,6 +793,11 @@
   </style>
 </head>
 <body>
+  <a class="social-link" href="https://www.instagram.com/toter_stern_/" aria-label="Instagram Toterstern" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 1.8A3.7 3.7 0 0 0 3.8 7.5v9a3.7 3.7 0 0 0 3.7 3.7h9a3.7 3.7 0 0 0 3.7-3.7v-9a3.7 3.7 0 0 0-3.7-3.7h-9Zm9.75 1.35a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 6.5A5.5 5.5 0 1 1 6.5 12 5.5 5.5 0 0 1 12 6.5Zm0 1.8A3.7 3.7 0 1 0 15.7 12 3.7 3.7 0 0 0 12 8.3Z"/>
+    </svg>
+  </a>
   <div class="site-preloader" id="site-preloader" aria-label="Loading">
     <img class="site-preloader-video" src="img-int/preloader-dog.gif?v=20260420-1" alt="" aria-hidden="true">
   </div>
@@ -744,23 +860,38 @@
         <p>Узнайте, чем для Золушки обернутся её мечты, в моём авторском комиксе.</p>
       </article>
       <div class="cover-reveal">
-        <div class="cover-reveal-stack">
-          <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса «Золушка. Кровавый восход»">
-            <img
-              class="cover-reveal-image"
-              id="cover-reveal-image"
-              src="comics/Book_sm.png?v=20260428-1"
-              alt="Обложка графической новеллы «Золушка. Кровавый восход»"
-            >
-          </a>
-          <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса по кнопке">
-            <img
-              class="feature-button-image"
-              src="comics/Vstavka_tr.png?v=20260428-1"
-              alt="Кнопка перехода на страницу графической новеллы"
-            >
-          </a>
-        </div>
+        <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса «Золушка. Кровавый восход»">
+          <img
+            class="cover-reveal-image"
+            id="cover-reveal-image"
+            src="comics/Book_sm.png?v=20260428-1"
+            alt="Обложка графической новеллы «Золушка. Кровавый восход»"
+          >
+        </a>
+      </div>
+      <div class="feature-button">
+        <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса по кнопке">
+          <img
+            class="feature-button-image"
+            src="comics/Vstavka_tr.png?v=20260428-1"
+            alt="Кнопка перехода на страницу графической новеллы"
+          >
+        </a>
+      </div>
+      <div class="embed-code">
+        <button class="copy-code-button" type="button" aria-label="Скопировать код баннера" data-copy-target="embed-code-vstavka" data-tooltip="скопировать код">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3h9a2 2 0 0 1 2 2v9h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v10h9V9H5Z"/>
+          </svg>
+        </button>
+        <p class="embed-code-label">Код для вставки баннера на другой сайт</p>
+        <pre><code id="embed-code-vstavka">&lt;a href="https://toterstern.com/zolushka.html" target="_blank" rel="noopener noreferrer" title="Toterstern — Zolushka comic reader"&gt;
+  &lt;img
+    src="https://toterstern.com/comics/Vstavka_tr.png"
+    alt="Золушка. Кровавый восход — авторская графическая новелла Toterstern"
+    style="display:block;max-width:100%;height:auto;border:0"
+  &gt;
+&lt;/a&gt;</code></pre>
       </div>
       <div class="feature-insert">
         <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса через вставку">
@@ -770,6 +901,21 @@
             alt="Дополнительная вставка графической новеллы"
           >
         </a>
+      </div>
+      <div class="embed-code">
+        <button class="copy-code-button" type="button" aria-label="Скопировать код вставки" data-copy-target="embed-code-vstavka2" data-tooltip="скопировать код">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3h9a2 2 0 0 1 2 2v9h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v10h9V9H5Z"/>
+          </svg>
+        </button>
+        <p class="embed-code-label">Код для вставки мини-баннера на другой сайт</p>
+        <pre><code id="embed-code-vstavka2">&lt;a href="https://toterstern.com/zolushka.html" target="_blank" rel="noopener noreferrer" title="Toterstern — Zolushka comic reader"&gt;
+  &lt;img
+    src="https://toterstern.com/comics/Vstavka2_tr.png"
+    alt="Графическая новелла «Золушка. Кровавый восход» — читать на Toterstern"
+    style="display:block;max-width:100%;height:auto;border:0"
+  &gt;
+&lt;/a&gt;</code></pre>
       </div>
     </section>
   </div>
@@ -807,6 +953,7 @@
       const cardCarouselOpen = document.getElementById("card-carousel-open");
       const cardCarouselZoom = document.getElementById("card-carousel-zoom");
       const cardDots = Array.from(document.querySelectorAll(".card-carousel-dot"));
+      const copyCodeButtons = Array.from(document.querySelectorAll(".copy-code-button"));
       const cardCarouselPrev = document.getElementById("card-carousel-prev");
       const cardCarouselNext = document.getElementById("card-carousel-next");
       const cardCarouselDelay = 4200;
@@ -1019,6 +1166,49 @@
           target.closest('input, textarea, select, [contenteditable="true"]')
         );
       };
+
+      const copyTextToClipboard = async (text) => {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          return;
+        }
+
+        const tempTextArea = document.createElement("textarea");
+        tempTextArea.value = text;
+        tempTextArea.setAttribute("readonly", "");
+        tempTextArea.style.position = "absolute";
+        tempTextArea.style.left = "-9999px";
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        document.execCommand("copy");
+        tempTextArea.remove();
+      };
+
+      copyCodeButtons.forEach((button) => {
+        let tooltipResetTimer = 0;
+
+        button.addEventListener("click", async () => {
+          const targetId = button.dataset.copyTarget;
+          const source = targetId ? document.getElementById(targetId) : null;
+          const code = source?.textContent ?? "";
+
+          if (!code) {
+            return;
+          }
+
+          try {
+            await copyTextToClipboard(code);
+            button.dataset.tooltip = "код скопирован";
+          } catch (_error) {
+            button.dataset.tooltip = "ошибка копирования";
+          }
+
+          window.clearTimeout(tooltipResetTimer);
+          tooltipResetTimer = window.setTimeout(() => {
+            button.dataset.tooltip = "скопировать код";
+          }, 1600);
+        });
+      });
 
       cardCarouselPrev.addEventListener("click", () => {
         showPrevCardSlide();
