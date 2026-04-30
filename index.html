@@ -206,7 +206,7 @@
     .social-links {
       position: fixed;
       top: clamp(14px, 3vw, 28px);
-      right: calc((100vw - min(var(--story-stack-max), calc(100vw - (var(--page-gutter) * 2)))) / 2);
+      right: calc((100vw - min(var(--story-stack-max), calc(100vw - (var(--page-gutter) * 2)))) / 2 + clamp(12px, 2vw, 28px));
       z-index: 12;
       display: flex;
       align-items: center;
@@ -864,7 +864,16 @@
       }
 
       .card-carousel {
+        position: relative;
+        left: 50%;
         width: min(73.6vw, 288px);
+        transform: translateX(-50%);
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .social-links {
+        right: calc((100vw - min(100%, var(--strip-width))) / 2 + clamp(14px, 3vw, 22px));
       }
 
       .cover-reveal-image {
