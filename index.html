@@ -51,6 +51,7 @@
       --story-note-top: calc(var(--bar-top) + var(--bar-height) + 5vh);
       --window-top-gap: 5vh;
       --window-width: min(78vw, 720px);
+      --story-stack-max: 720px;
       --strip-top-gap: 5vh;
       --debug-grid: 0;
       --debug-grid-color: rgba(255, 216, 0, 0.22);
@@ -202,11 +203,26 @@
       pointer-events: none;
     }
 
-    .social-link {
+    .social-links {
       position: fixed;
       top: clamp(14px, 3vw, 28px);
-      right: clamp(14px, 3vw, 28px);
+      right: calc((100vw - min(var(--story-stack-max), calc(100vw - (var(--page-gutter) * 2)))) / 2);
       z-index: 12;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: clamp(10px, 2vw, 16px);
+      transition: opacity 180ms ease, visibility 180ms ease;
+    }
+
+    .social-links.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .social-link {
+      position: relative;
       display: grid;
       place-items: center;
       width: clamp(38px, 5vw, 48px);
@@ -902,11 +918,18 @@
   </style>
 </head>
 <body>
-  <a class="social-link" href="https://www.instagram.com/toter_stern_/" aria-label="Instagram Toterstern" target="_blank" rel="noopener noreferrer">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 1.8A3.7 3.7 0 0 0 3.8 7.5v9a3.7 3.7 0 0 0 3.7 3.7h9a3.7 3.7 0 0 0 3.7-3.7v-9a3.7 3.7 0 0 0-3.7-3.7h-9Zm9.75 1.35a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 6.5A5.5 5.5 0 1 1 6.5 12 5.5 5.5 0 0 1 12 6.5Zm0 1.8A3.7 3.7 0 1 0 15.7 12 3.7 3.7 0 0 0 12 8.3Z"/>
-    </svg>
-  </a>
+  <div class="social-links" aria-label="Социальные сети Toterstern">
+    <a class="social-link" href="https://www.instagram.com/toter_stern_/" aria-label="Instagram Toterstern" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 1.8A3.7 3.7 0 0 0 3.8 7.5v9a3.7 3.7 0 0 0 3.7 3.7h9a3.7 3.7 0 0 0 3.7-3.7v-9a3.7 3.7 0 0 0-3.7-3.7h-9Zm9.75 1.35a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 6.5A5.5 5.5 0 1 1 6.5 12 5.5 5.5 0 0 1 12 6.5Zm0 1.8A3.7 3.7 0 1 0 15.7 12 3.7 3.7 0 0 0 12 8.3Z"/>
+      </svg>
+    </a>
+    <a class="social-link" href="https://t.me/totersproter" aria-label="Telegram Totersproter" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21.2 4.3c.35-.14.73.17.64.54l-2.87 13.52a.58.58 0 0 1-.85.38l-4.43-2.42-2.27 2.18a.58.58 0 0 1-.98-.42v-3.77l7.73-6.97c.28-.25-.08-.67-.41-.46l-9.55 6.02-4.11-1.3a.57.57 0 0 1-.03-1.08L21.2 4.3Z"/>
+      </svg>
+    </a>
+  </div>
   <div class="site-preloader" id="site-preloader" aria-label="Loading">
     <img class="site-preloader-video" src="img-int/preloader-dog.gif?v=20260420-1" alt="" aria-hidden="true">
   </div>
@@ -1061,6 +1084,8 @@
       const strip = document.getElementById("quad-strip");
       const phoneStage = document.querySelector(".phone-stage");
       const storyStack = document.querySelector(".story-stack");
+      const socialLinks = document.querySelector(".social-links");
+      const topBar = document.querySelector(".top-bar");
       const bookModal = document.getElementById("book-modal");
       const bookModalPrev = document.getElementById("book-modal-prev");
       const bookModalNext = document.getElementById("book-modal-next");
@@ -1260,6 +1285,15 @@
         touchB.clientY - touchA.clientY
       );
 
+      const updateSocialLinksVisibility = () => {
+        if (!socialLinks || !topBar) {
+          return;
+        }
+
+        const topBarRect = topBar.getBoundingClientRect();
+        socialLinks.classList.toggle("is-hidden", topBarRect.bottom <= 0);
+      };
+
       function updateCoverRotation() {
         if (!coverRevealImage) {
           return;
@@ -1272,6 +1306,7 @@
         const rotation = normalizedOffset * -30;
 
         coverRevealImage.style.setProperty("--cover-rotation", `${rotation}deg`);
+        updateSocialLinksVisibility();
       }
 
       const isBookModalFullscreen = () => document.fullscreenElement === bookModal;
