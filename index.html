@@ -322,6 +322,24 @@
       margin-top: 1em;
     }
 
+    .story-bottom-link {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      justify-content: center;
+      margin: clamp(1px, 0.4vw, 4px) auto 0;
+    }
+
+    .story-bottom-image {
+      display: block;
+      width: clamp(34px, 5vw, 46px);
+      height: auto;
+      object-fit: contain;
+      transform: scale(0.84);
+      transform-origin: center center;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
+    }
+
     .cover-reveal {
       display: flex;
       justify-content: center;
@@ -994,6 +1012,11 @@
         <p>Это не романтическая новелла, а трагедия о падении человеческой души, о цене, которую готовы платить люди ради достижения своих целей — будь то любовь, могущество или признание.</p>
         <p>Узнайте, чем для Золушки обернутся её мечты, в моём авторском комиксе.</p>
       </article>
+      <div class="story-bottom-link">
+        <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса по нижнему знаку">
+          <img class="story-bottom-image" src="img-int/s-bottom.png" alt="Перейти к комиксу">
+        </a>
+      </div>
       <div class="cover-reveal">
         <a class="cover-reveal-link" href="zolushka.html" aria-label="Перейти на страницу комикса «Золушка. Кровавый восход»">
           <img
