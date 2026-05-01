@@ -220,15 +220,14 @@
       place-items: center;
       width: clamp(38px, 5vw, 48px);
       height: clamp(38px, 5vw, 48px);
-      color: rgba(244, 239, 229, 0.92);
-      background: rgba(5, 5, 5, 0.28);
-      border: 1px solid rgba(244, 239, 229, 0.14);
+      color: #ffffff;
+      background: transparent;
+      border: 1px solid transparent;
       border-radius: 999px;
-      backdrop-filter: blur(4px);
       cursor: var(--cursor-active);
-      opacity: 0.3;
+      opacity: 1;
       box-shadow: 0 0 0 rgba(255, 244, 214, 0);
-      transition: opacity 180ms ease, color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
     }
 
     .social-link svg {
@@ -242,9 +241,9 @@
     .social-link:hover,
     .social-link:focus-visible {
       opacity: 1;
-      color: rgba(244, 239, 229, 0.96);
-      background: rgba(5, 5, 5, 0.52);
-      border-color: rgba(244, 239, 229, 0.3);
+      color: #ffffff;
+      background: rgba(5, 5, 5, 0.42);
+      border-color: rgba(255, 255, 255, 0.78);
       box-shadow: 0 0 24px rgba(255, 244, 214, 0.18);
     }
 
